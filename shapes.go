@@ -57,6 +57,8 @@ const (
 	POP
 	READ
 	WRITE
+	COPY
+	SET
 )
 
 func Compile(ast *AST) (*Process, error) {
@@ -169,6 +171,8 @@ func MakeRuntime(process *Process, input io.Reader, output io.Writer) *Runtime {
 		runtime.pop,
 		runtime.read,
 		runtime.write,
+		runtime.copy,
+		runtime.set,
 	}
 
 	return runtime
@@ -264,6 +268,20 @@ func (runtime *Runtime) write(op Operation) {
 		runtime.Process.Error = errors.Wrap(err, errMsg)
 		return
 	}
+}
+
+func (runtime *Runtime) copy(op Operation) {
+	val := runtime.Process.GetRegister(op.Operands[1])
+
+	if runtime.hasError() {
+		return
+	}
+
+	runtime.Process.SetRegister(op.Operands[0], val)
+}
+
+func (runtime *Runtime) set(op Operation) {
+	runtime.Process.SetRegister(op.Operands[0], byte(op.Operands[1]))
 }
 
 func (runtime *Runtime) Execute() error {
