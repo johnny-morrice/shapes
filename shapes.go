@@ -6,7 +6,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-func ExecuteProgramCode(source string, input io.Reader, output io.Writer) error {
+func ExecuteProgramCode(source []byte, input io.Reader, output io.Writer) error {
 	const errMsg = "ExecuteProgramCode failed"
 
 	ast, err := Parse(source)
@@ -35,7 +35,7 @@ func ExecuteProgramCode(source string, input io.Reader, output io.Writer) error 
 type AST struct {
 }
 
-func Parse(source string) (*AST, error) {
+func Parse(source []byte) (*AST, error) {
 	panic("not implemented")
 }
 

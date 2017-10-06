@@ -51,13 +51,12 @@ var RootCmd = &cobra.Command{
 			dieHelp(cmd)
 		}
 
-		bs, err := ioutil.ReadFile(sourceFile)
+		source, err := ioutil.ReadFile(sourceFile)
 
 		if err != nil {
 			die(err)
 		}
 
-		source := string(bs)
 		err = shapes.ExecuteProgramCode(source, os.Stdin, os.Stdout)
 
 		if err != nil {
