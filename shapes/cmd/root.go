@@ -58,7 +58,7 @@ var RootCmd = &cobra.Command{
 		}
 
 		source := string(bs)
-		err = shapes.ExecuteProgramCode(source)
+		err = shapes.ExecuteProgramCode(source, os.Stdin, os.Stdout)
 
 		if err != nil {
 			die(err)
