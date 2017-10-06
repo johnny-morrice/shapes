@@ -21,11 +21,7 @@ func ExecuteProgramCode(source string, input io.Reader, output io.Writer) error 
 		return errors.Wrap(err, errMsg)
 	}
 
-	runtime := &Runtime{
-		Process: process,
-		Input:   input,
-		Output:  output,
-	}
+	runtime := MakeRuntime(process, input, output)
 
 	err = runtime.Execute()
 
@@ -99,6 +95,51 @@ type Runtime struct {
 	Output    io.Writer
 }
 
+func MakeRuntime(process *Process, input io.Reader, output io.Writer) *Runtime {
+	runtime := &Runtime{
+		Process: process,
+		Input:   input,
+		Output:  output,
+	}
+
+	runtime.CallTable = []RuntimeCall{
+		runtime.jmpnz,
+		runtime.add,
+		runtime.sub,
+		runtime.read,
+		runtime.write,
+	}
+
+	return runtime
+}
+
+func (runtime *Runtime) jmpnz(operand Operand) {
+	panic("notimplemented")
+}
+
+func (runtime *Runtime) add(operand Operand) {
+	panic("notimplemented")
+}
+
+func (runtime *Runtime) sub(operand Operand) {
+	panic("notimplemented")
+}
+
+func (runtime *Runtime) read(operand Operand) {
+	panic("notimplemented")
+}
+
+func (runtime *Runtime) write(operand Operand) {
+	panic("notimplemented")
+}
+
 func (runtime *Runtime) Execute() error {
-	panic("not implemented")
+	for runtime.Process.ExecuteStep(runtime.CallTable) {
+	}
+
+	if runtime.Process.Error != nil {
+		return runtime.Process.Error
+	}
+
+	return nil
 }
