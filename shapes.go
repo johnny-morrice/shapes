@@ -44,8 +44,7 @@ type Operand int
 
 type Operation struct {
 	OpCode   OpCode
-	Register int
-	Operand  Operand
+	Operands [2]int
 }
 
 type OpCode byte
@@ -144,17 +143,22 @@ func (process *Process) SetRegister(register int, val byte) {
 type RuntimeCall func(op Operation)
 
 type Runtime struct {
-	Process   *Process
-	CallTable []RuntimeCall
-	Input     io.Reader
-	Output    io.Writer
+	Process     *Process
+	Error       error
+	CallTable   []RuntimeCall
+	Input       io.Reader
+	Output      io.Writer
+	readBuffer  []byte
+	writeBuffer []byte
 }
 
 func MakeRuntime(process *Process, input io.Reader, output io.Writer) *Runtime {
 	runtime := &Runtime{
-		Process: process,
-		Input:   input,
-		Output:  output,
+		Process:     process,
+		Input:       input,
+		Output:      output,
+		readBuffer:  []byte{0},
+		writeBuffer: []byte{0},
 	}
 
 	runtime.CallTable = []RuntimeCall{
@@ -170,36 +174,96 @@ func MakeRuntime(process *Process, input io.Reader, output io.Writer) *Runtime {
 	return runtime
 }
 
+func (runtime *Runtime) hasError() bool {
+	return runtime.Process.Error != nil
+}
+
 func (runtime *Runtime) jmpnz(op Operation) {
-	val := runtime.Process.GetRegister(op.Register)
+	val := runtime.Process.GetRegister(op.Operands[0])
+
+	if runtime.hasError() {
+		return
+	}
 
 	if val != 0 {
-		runtime.Process.PC = int(op.Operand)
+		runtime.Process.PC = int(op.Operands[1])
 	}
 }
 
+func (runtime *Runtime) onRegisters(op Operation, f func(valZero, valOne byte) byte) {
+	valZero := runtime.Process.GetRegister(op.Operands[0])
+
+	if runtime.hasError() {
+		return
+	}
+
+	valOne := runtime.Process.GetRegister(op.Operands[1])
+
+	if runtime.hasError() {
+		return
+	}
+
+	newVal := f(valZero, valOne)
+	runtime.Process.SetRegister(op.Operands[0], newVal)
+}
+
 func (runtime *Runtime) add(op Operation) {
-	panic("not implemented")
+	runtime.onRegisters(op, func(valZero, valOne byte) byte {
+		return valZero + valOne
+	})
 }
 
 func (runtime *Runtime) sub(op Operation) {
-	panic("notimplemented")
+	runtime.onRegisters(op, func(valZero, valOne byte) byte {
+		return valZero - valOne
+	})
 }
 
 func (runtime *Runtime) push(op Operation) {
-	panic("notimplemented")
+	val := runtime.Process.GetRegister(op.Operands[0])
+
+	if runtime.hasError() {
+		return
+	}
+
+	runtime.Process.Push(val)
 }
 
 func (runtime *Runtime) pop(op Operation) {
-	panic("notimplemented")
+	tip := runtime.Process.Pop()
+
+	if runtime.hasError() {
+		return
+	}
+
+	runtime.Process.SetRegister(op.Operands[0], tip)
 }
 
 func (runtime *Runtime) read(op Operation) {
-	panic("notimplemented")
+	const errMsg = "Runtime.read failed"
+
+	_, err := runtime.Input.Read(runtime.readBuffer)
+
+	if err != nil {
+		runtime.Process.Error = errors.Wrap(err, errMsg)
+		return
+	}
+
+	runtime.Process.SetRegister(op.Operands[0], runtime.readBuffer[0])
 }
 
 func (runtime *Runtime) write(op Operation) {
-	panic("notimplemented")
+	const errMsg = "Runtime.Write failed"
+
+	val := runtime.Process.GetRegister(op.Operands[0])
+	runtime.writeBuffer[0] = val
+
+	_, err := runtime.Output.Write(runtime.writeBuffer)
+
+	if err != nil {
+		runtime.Process.Error = errors.Wrap(err, errMsg)
+		return
+	}
 }
 
 func (runtime *Runtime) Execute() error {
