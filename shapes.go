@@ -34,7 +34,105 @@ func ExecuteProgramCode(source []byte, input io.Reader, output io.Writer) error 
 }
 
 type AST struct {
+	Statements []Statement
 }
+
+type Statement interface {
+	Visit(visitor ASTVisitor)
+}
+
+type ASTVisitor interface {
+	VisitLoop(loop *LoopStmt)
+	VisitAdd(add *AddStmt)
+	VisitSub(sub *SubStmt)
+	VisitPush(push *PushStmt)
+	VisitPop(pop *PopStmt)
+	VisitRead(read *ReadStmt)
+	VisitWrite(write *WriteStmt)
+	VisitSet(set *SetStmt)
+}
+
+type LoopStmt struct {
+	Operand string
+	Nest    []Statement
+}
+
+func (stmt *LoopStmt) Visit(visitor ASTVisitor) {
+	visitor.VisitLoop(stmt)
+}
+
+type TwoOperandStmt struct {
+	Operands [2]string
+}
+
+type AddStmt struct {
+	TwoOperandStmt
+}
+
+type SubStmt struct {
+	TwoOperandStmt
+}
+
+type PushStmt struct {
+	TwoOperandStmt
+}
+
+type PopStmt struct {
+	TwoOperandStmt
+}
+
+type ReadStmt struct {
+	TwoOperandStmt
+}
+
+type WriteStmt struct {
+	TwoOperandStmt
+}
+
+type SetStmt struct {
+	TwoOperandStmt
+}
+
+func (stmt *AddStmt) Visit(visitor ASTVisitor) {
+	visitor.VisitAdd(stmt)
+}
+
+func (stmt *SubStmt) Visit(visitor ASTVisitor) {
+	visitor.VisitSub(stmt)
+}
+
+func (stmt *PushStmt) Visit(visitor ASTVisitor) {
+	visitor.VisitPush(stmt)
+}
+
+func (stmt *PopStmt) Visit(visitor ASTVisitor) {
+	visitor.VisitPop(stmt)
+}
+
+func (stmt *ReadStmt) Visit(visitor ASTVisitor) {
+	visitor.VisitRead(stmt)
+}
+
+func (stmt *WriteStmt) Visit(visitor ASTVisitor) {
+	visitor.VisitWrite(stmt)
+}
+
+func (stmt *SetStmt) Visit(visitor ASTVisitor) {
+	visitor.VisitSet(stmt)
+}
+
+type StatementType uint8
+
+const (
+	STMT_LOOP = iota
+	STMT_ADD
+	STMT_SUB
+	STMT_PUSH
+	STMT_POP
+	STMT_READ
+	STMT_WRITE
+	STMT_SET
+)
 
 func Parse(source []byte) (*AST, error) {
 	panic("not implemented")
@@ -50,20 +148,16 @@ type Operation struct {
 type OpCode byte
 
 const (
-	JMPNZ = OpCode(iota)
-	ADD
-	SUB
-	PUSH
-	POP
-	READ
-	WRITE
-	COPY
-	SET
+	OP_JMPNZ = OpCode(iota)
+	OP_ADD
+	OP_SUB
+	OP_PUSH
+	OP_POP
+	OP_READ
+	OP_WRITE
+	OP_COPY
+	OP_SET
 )
-
-func Compile(ast *AST) (*Process, error) {
-	panic("not implemented")
-}
 
 type Process struct {
 	PC       int
@@ -71,6 +165,10 @@ type Process struct {
 	Register [REGISTER_COUNT]byte
 	Stack    []byte
 	Error    error
+}
+
+func Compile(ast *AST) (*Process, error) {
+	panic("not implemented")
 }
 
 func (process *Process) IsTerminated() bool {
