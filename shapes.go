@@ -15,16 +15,16 @@ func ExecuteProgramCode(source string, input io.Reader, output io.Writer) error 
 		return errors.Wrap(err, errMsg)
 	}
 
-	code, err := Compile(ast)
+	process, err := Compile(ast)
 
 	if err != nil {
 		return errors.Wrap(err, errMsg)
 	}
 
 	runtime := &Runtime{
-		ByteCode: code,
-		Input:    input,
-		Output:   output,
+		Process: process,
+		Input:   input,
+		Output:  output,
 	}
 
 	err = runtime.Execute()
@@ -43,17 +43,60 @@ func Parse(source string) (*AST, error) {
 	panic("not implemented")
 }
 
-type ByteCode struct {
+type Operand int
+
+type Operation struct {
+	OpCode  OpCode
+	Operand Operand
 }
 
-func Compile(ast *AST) ([]ByteCode, error) {
+type OpCode byte
+
+const (
+	JMPNZ = OpCode(iota)
+	ADD
+	SUB
+	READ
+	WRITE
+)
+
+func Compile(ast *AST) (*Process, error) {
 	panic("not implemented")
 }
 
+type Process struct {
+	PC       int
+	ByteCode []Operation
+	Register []byte
+	Stack    []byte
+	Error    error
+}
+
+func (process *Process) ExecuteStep(callTable []RuntimeCall) bool {
+	if process.PC >= len(process.ByteCode) {
+		return false
+	}
+
+	op := process.ByteCode[process.PC]
+
+	impl := callTable[op.OpCode]
+
+	impl(op.Operand)
+
+	if process.Error != nil {
+		return false
+	}
+
+	return true
+}
+
+type RuntimeCall func(operand Operand)
+
 type Runtime struct {
-	ByteCode []ByteCode
-	Input    io.Reader
-	Output   io.Writer
+	Process   *Process
+	CallTable []RuntimeCall
+	Input     io.Reader
+	Output    io.Writer
 }
 
 func (runtime *Runtime) Execute() error {
