@@ -73,22 +73,16 @@ type Process struct {
 	Error    error
 }
 
-func (process *Process) ExecuteStep(callTable []RuntimeCall) bool {
-	if process.PC >= len(process.ByteCode) {
-		return false
-	}
+func (process *Process) IsTerminated() bool {
+	return process.PC >= len(process.ByteCode) || process.Error != nil
+}
 
+func (process *Process) ExecuteStep(callTable []RuntimeCall) {
 	op := process.ByteCode[process.PC]
 
 	impl := callTable[op.OpCode]
 
 	impl(op)
-
-	if process.Error != nil {
-		return false
-	}
-
-	return true
 }
 
 func (process *Process) Peek() byte {
@@ -285,7 +279,8 @@ func (runtime *Runtime) set(op Operation) {
 }
 
 func (runtime *Runtime) Execute() error {
-	for runtime.Process.ExecuteStep(runtime.CallTable) {
+	for !runtime.Process.IsTerminated() {
+		runtime.Process.ExecuteStep(runtime.CallTable)
 	}
 
 	if runtime.Process.Error != nil {
