@@ -1,0 +1,6 @@
+*.prof
+shapes/shapes
+*.test
+nohup.out
+*.bolt
+*.log
