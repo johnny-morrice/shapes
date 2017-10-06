@@ -1,6 +1,7 @@
 package shapes
 
 import (
+	"fmt"
 	"io"
 
 	"github.com/pkg/errors"
@@ -42,8 +43,9 @@ func Parse(source []byte) (*AST, error) {
 type Operand int
 
 type Operation struct {
-	OpCode  OpCode
-	Operand Operand
+	OpCode   OpCode
+	Register int
+	Operand  Operand
 }
 
 type OpCode byte
@@ -65,7 +67,7 @@ func Compile(ast *AST) (*Process, error) {
 type Process struct {
 	PC       int
 	ByteCode []Operation
-	Register []byte
+	Register [REGISTER_COUNT]byte
 	Stack    []byte
 	Error    error
 }
@@ -79,7 +81,7 @@ func (process *Process) ExecuteStep(callTable []RuntimeCall) bool {
 
 	impl := callTable[op.OpCode]
 
-	impl(op.Operand)
+	impl(op)
 
 	if process.Error != nil {
 		return false
@@ -88,7 +90,58 @@ func (process *Process) ExecuteStep(callTable []RuntimeCall) bool {
 	return true
 }
 
-type RuntimeCall func(operand Operand)
+func (process *Process) Peek() byte {
+	if len(process.Stack) == 0 {
+		process.failEmptyStack()
+		return 0
+	}
+
+	return process.Stack[len(process.Stack)-1]
+}
+
+func (process *Process) Pop() byte {
+	tip := process.Peek()
+
+	if process.Error != nil {
+		return 0
+	}
+
+	process.Stack = process.Stack[:len(process.Stack)-1]
+
+	return tip
+}
+
+func (process *Process) failEmptyStack() {
+	process.Error = errors.New("stack was empty")
+}
+
+func (process *Process) failNoSuchRegister(register int) {
+	process.Error = fmt.Errorf("No such register '%d'", register)
+}
+
+func (process *Process) Push(tip byte) {
+	process.Stack = append(process.Stack, tip)
+}
+
+func (process *Process) GetRegister(register int) byte {
+	if register >= REGISTER_COUNT {
+		process.failNoSuchRegister(register)
+		return 0
+	}
+
+	return process.Register[register]
+}
+
+func (process *Process) SetRegister(register int, val byte) {
+	if register >= REGISTER_COUNT {
+		process.failNoSuchRegister(register)
+		return
+	}
+
+	process.Register[register] = val
+}
+
+type RuntimeCall func(op Operation)
 
 type Runtime struct {
 	Process   *Process
@@ -117,31 +170,35 @@ func MakeRuntime(process *Process, input io.Reader, output io.Writer) *Runtime {
 	return runtime
 }
 
-func (runtime *Runtime) jmpnz(operand Operand) {
+func (runtime *Runtime) jmpnz(op Operation) {
+	val := runtime.Process.GetRegister(op.Register)
+
+	if val != 0 {
+		runtime.Process.PC = int(op.Operand)
+	}
+}
+
+func (runtime *Runtime) add(op Operation) {
+	panic("not implemented")
+}
+
+func (runtime *Runtime) sub(op Operation) {
 	panic("notimplemented")
 }
 
-func (runtime *Runtime) add(operand Operand) {
+func (runtime *Runtime) push(op Operation) {
 	panic("notimplemented")
 }
 
-func (runtime *Runtime) sub(operand Operand) {
+func (runtime *Runtime) pop(op Operation) {
 	panic("notimplemented")
 }
 
-func (runtime *Runtime) push(operand Operand) {
+func (runtime *Runtime) read(op Operation) {
 	panic("notimplemented")
 }
 
-func (runtime *Runtime) pop(operand Operand) {
-	panic("notimplemented")
-}
-
-func (runtime *Runtime) read(operand Operand) {
-	panic("notimplemented")
-}
-
-func (runtime *Runtime) write(operand Operand) {
+func (runtime *Runtime) write(op Operation) {
 	panic("notimplemented")
 }
 
@@ -155,3 +212,5 @@ func (runtime *Runtime) Execute() error {
 
 	return nil
 }
+
+const REGISTER_COUNT = 256
