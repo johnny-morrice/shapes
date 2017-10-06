@@ -52,6 +52,8 @@ const (
 	JMPNZ = OpCode(iota)
 	ADD
 	SUB
+	PUSH
+	POP
 	READ
 	WRITE
 )
@@ -106,6 +108,8 @@ func MakeRuntime(process *Process, input io.Reader, output io.Writer) *Runtime {
 		runtime.jmpnz,
 		runtime.add,
 		runtime.sub,
+		runtime.push,
+		runtime.pop,
 		runtime.read,
 		runtime.write,
 	}
@@ -122,6 +126,14 @@ func (runtime *Runtime) add(operand Operand) {
 }
 
 func (runtime *Runtime) sub(operand Operand) {
+	panic("notimplemented")
+}
+
+func (runtime *Runtime) push(operand Operand) {
+	panic("notimplemented")
+}
+
+func (runtime *Runtime) pop(operand Operand) {
 	panic("notimplemented")
 }
 
