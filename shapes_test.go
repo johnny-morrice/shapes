@@ -2,6 +2,7 @@ package shapes
 
 import (
 	"bytes"
+	"strconv"
 	"testing"
 )
 
@@ -97,4 +98,26 @@ func executeHelper(t *testing.T, input cannedProcess, expect cannedProcess) {
 	if !ok {
 		t.Fail()
 	}
+}
+
+func TestOperationLongAddress(t *testing.T) {
+	op := Operation{}
+	op.Operand[0] = Operand(binary("01101010", 8))
+	op.Operand[1] = Operand(binary("11000101", 8))
+	expected := LongAddress(binary("0110101011000101", 16))
+	long := op.LongAddress()
+
+	if long != expected {
+		t.Errorf("Expected %b but received %b", expected, long)
+	}
+}
+
+func binary(text string, size int) uint64 {
+	num, err := strconv.ParseUint(text, 2, size)
+
+	if err != nil {
+		panic(err)
+	}
+
+	return num
 }
