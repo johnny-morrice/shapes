@@ -29,8 +29,11 @@ func TestRuntimeExecute(t *testing.T) {
 		[2]cannedProcess{jmpnzInput, jmpnzExpect},
 	}
 
-	for _, test := range table {
-		runtimeExecuteHelper(t, test[0], test[1])
+	for i, test := range table {
+		ok := runtimeExecuteHelper(t, test[0], test[1])
+		if !ok {
+			t.Errorf("Failure in test case %d", i)
+		}
 	}
 }
 
@@ -58,7 +61,8 @@ func jmpnzTestData() (cannedProcess, cannedProcess) {
 	input := makeInputProcess(byteCode, []byte{})
 
 	register := [MAX_WORD]byte{}
-	register[1] = 55
+	register[1] = 1
+	register[2] = 55
 	expect := makeExpectProcess(byteCode, register, [MAX_WORD][]byte{}, []byte{})
 
 	return input, expect
@@ -302,7 +306,7 @@ func (canned cannedProcess) sameOutput(t *testing.T, other cannedProcess) bool {
 	return true
 }
 
-func runtimeExecuteHelper(t *testing.T, input cannedProcess, expect cannedProcess) {
+func runtimeExecuteHelper(t *testing.T, input cannedProcess, expect cannedProcess) bool {
 	t.Helper()
 
 	runtime := input.makeRuntime()
@@ -314,11 +318,9 @@ func runtimeExecuteHelper(t *testing.T, input cannedProcess, expect cannedProces
 		t.Error("Unexpected error state")
 	}
 
-	ok = ok && input.sameRegisters(t, expect)
-	ok = ok && input.sameStack(t, expect)
-	ok = ok && input.sameOutput(t, expect)
+	ok = ok && expect.sameRegisters(t, input)
+	ok = ok && expect.sameStack(t, input)
+	ok = ok && expect.sameOutput(t, input)
 
-	if !ok {
-		t.Fail()
-	}
+	return ok
 }
