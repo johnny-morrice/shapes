@@ -31,20 +31,24 @@ func (canned cannedProcess) sameRegisters(t *testing.T, other cannedProcess) boo
 func (canned cannedProcess) sameStack(t *testing.T, other cannedProcess) bool {
 	t.Helper()
 
-	myStackLen := len(canned.process.Stack)
-	theirStackLen := len(other.process.Stack)
-	if myStackLen != theirStackLen {
-		t.Errorf("Expected stack length %d but was %d", myStackLen, theirStackLen)
-		return false
-	}
-
-	for i, myStk := range canned.process.Stack {
-		theirStk := other.process.Stack[i]
-
-		if myStk != theirStk {
-			t.Errorf("Mismatched stack entry %d: expected %d but was %d", i, myStk, theirStk)
+	for i, myStack := range canned.process.Stack {
+		theirStack := other.process.Stack[i]
+		myStackLen := len(canned.process.Stack)
+		theirStackLen := len(other.process.Stack)
+		if myStackLen != theirStackLen {
+			t.Errorf("Expected stack %d length %d but was %d", i, myStackLen, theirStackLen)
 			return false
 		}
+
+		for j, myEntry := range myStack {
+			theirEntry := theirStack[j]
+
+			if myEntry != theirEntry {
+				t.Errorf("Mismatched stack %d entry %d: expected %d but was %d", i, j, myEntry, theirEntry)
+				return false
+			}
+		}
+
 	}
 
 	return true

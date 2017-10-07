@@ -145,6 +145,12 @@ type Operation struct {
 	Operands [2]int
 }
 
+func (op Operation) Address(operand Address) Address {
+	return Address(op.Operands[operand])
+}
+
+type Address uint8
+
 type OpCode byte
 
 const (
@@ -162,8 +168,8 @@ const (
 type Process struct {
 	PC       int
 	ByteCode []Operation
-	Register [REGISTER_COUNT]byte
-	Stack    []byte
+	Register [MAX_WORD]byte
+	Stack    [MAX_WORD][]byte
 	Error    error
 }
 
@@ -183,54 +189,43 @@ func (process *Process) ExecuteStep(callTable []RuntimeCall) {
 	impl(op)
 }
 
-func (process *Process) Peek() byte {
-	if len(process.Stack) == 0 {
-		process.failEmptyStack()
+func (process *Process) Peek(stackAddr Address) byte {
+	stack := process.Stack[stackAddr]
+
+	if len(stack) == 0 {
+		process.failEmptyStack(stackAddr)
 		return 0
 	}
 
-	return process.Stack[len(process.Stack)-1]
+	return stack[len(stack)-1]
 }
 
-func (process *Process) Pop() byte {
-	tip := process.Peek()
+func (process *Process) Pop(stackAddr Address) byte {
+	tip := process.Peek(stackAddr)
 
 	if process.Error != nil {
 		return 0
 	}
 
-	process.Stack = process.Stack[:len(process.Stack)-1]
+	stack := process.Stack[stackAddr]
+	process.Stack[stackAddr] = stack[:len(stack)-1]
 
 	return tip
 }
 
-func (process *Process) failEmptyStack() {
-	process.Error = errors.New("stack was empty")
+func (process *Process) failEmptyStack(stackAddr Address) {
+	process.Error = fmt.Errorf("stack was empty '%d'", stackAddr)
 }
 
-func (process *Process) failNoSuchRegister(register int) {
-	process.Error = fmt.Errorf("No such register '%d'", register)
+func (process *Process) Push(stackAddr Address, tip byte) {
+	process.Stack[stackAddr] = append(process.Stack[stackAddr], tip)
 }
 
-func (process *Process) Push(tip byte) {
-	process.Stack = append(process.Stack, tip)
-}
-
-func (process *Process) GetRegister(register int) byte {
-	if register >= REGISTER_COUNT {
-		process.failNoSuchRegister(register)
-		return 0
-	}
-
+func (process *Process) GetRegister(register Address) byte {
 	return process.Register[register]
 }
 
-func (process *Process) SetRegister(register int, val byte) {
-	if register >= REGISTER_COUNT {
-		process.failNoSuchRegister(register)
-		return
-	}
-
+func (process *Process) SetRegister(register Address, val byte) {
 	process.Register[register] = val
 }
 
@@ -275,32 +270,32 @@ func (runtime *Runtime) hasError() bool {
 }
 
 func (runtime *Runtime) jmpnz(op Operation) {
-	val := runtime.Process.GetRegister(op.Operands[0])
+	val := runtime.Process.GetRegister(op.Address(0))
 
 	if runtime.hasError() {
 		return
 	}
 
 	if val != 0 {
-		runtime.Process.PC = int(op.Operands[1])
+		runtime.Process.PC = op.Operands[1]
 	}
 }
 
 func (runtime *Runtime) onRegisters(op Operation, f func(valZero, valOne byte) byte) {
-	valZero := runtime.Process.GetRegister(op.Operands[0])
+	valZero := runtime.Process.GetRegister(op.Address(0))
 
 	if runtime.hasError() {
 		return
 	}
 
-	valOne := runtime.Process.GetRegister(op.Operands[1])
+	valOne := runtime.Process.GetRegister(op.Address(1))
 
 	if runtime.hasError() {
 		return
 	}
 
 	newVal := f(valZero, valOne)
-	runtime.Process.SetRegister(op.Operands[0], newVal)
+	runtime.Process.SetRegister(op.Address(0), newVal)
 }
 
 func (runtime *Runtime) add(op Operation) {
@@ -316,23 +311,23 @@ func (runtime *Runtime) sub(op Operation) {
 }
 
 func (runtime *Runtime) push(op Operation) {
-	val := runtime.Process.GetRegister(op.Operands[0])
+	val := runtime.Process.GetRegister(op.Address(1))
 
 	if runtime.hasError() {
 		return
 	}
 
-	runtime.Process.Push(val)
+	runtime.Process.Push(op.Address(0), val)
 }
 
 func (runtime *Runtime) pop(op Operation) {
-	tip := runtime.Process.Pop()
+	tip := runtime.Process.Pop(op.Address(0))
 
 	if runtime.hasError() {
 		return
 	}
 
-	runtime.Process.SetRegister(op.Operands[0], tip)
+	runtime.Process.SetRegister(op.Address(1), tip)
 }
 
 func (runtime *Runtime) read(op Operation) {
@@ -345,13 +340,13 @@ func (runtime *Runtime) read(op Operation) {
 		return
 	}
 
-	runtime.Process.SetRegister(op.Operands[0], runtime.readBuffer[0])
+	runtime.Process.SetRegister(op.Address(0), runtime.readBuffer[0])
 }
 
 func (runtime *Runtime) write(op Operation) {
 	const errMsg = "Runtime.Write failed"
 
-	val := runtime.Process.GetRegister(op.Operands[0])
+	val := runtime.Process.GetRegister(op.Address(0))
 	runtime.writeBuffer[0] = val
 
 	_, err := runtime.Output.Write(runtime.writeBuffer)
@@ -363,17 +358,17 @@ func (runtime *Runtime) write(op Operation) {
 }
 
 func (runtime *Runtime) copy(op Operation) {
-	val := runtime.Process.GetRegister(op.Operands[1])
+	val := runtime.Process.GetRegister(op.Address(1))
 
 	if runtime.hasError() {
 		return
 	}
 
-	runtime.Process.SetRegister(op.Operands[0], val)
+	runtime.Process.SetRegister(op.Address(0), val)
 }
 
 func (runtime *Runtime) set(op Operation) {
-	runtime.Process.SetRegister(op.Operands[0], byte(op.Operands[1]))
+	runtime.Process.SetRegister(op.Address(0), byte(op.Address(1)))
 }
 
 func (runtime *Runtime) Execute() error {
@@ -388,4 +383,4 @@ func (runtime *Runtime) Execute() error {
 	return nil
 }
 
-const REGISTER_COUNT = 256
+const MAX_WORD = 256
