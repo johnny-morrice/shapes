@@ -138,18 +138,27 @@ func Parse(source []byte) (*AST, error) {
 	panic("not implemented")
 }
 
-type Operand int
+type Address uint8
+
+type LongAddress uint16
+
+type Operand uint8
 
 type Operation struct {
-	OpCode   OpCode
-	Operands [2]int
+	OpCode  OpCode
+	Operand [2]Operand
+}
+
+func (op Operation) LongAddress() LongAddress {
+	long := LongAddress(op.Operand[0])
+	long = long << 8
+	long = long | LongAddress(op.Operand[1])
+	return long
 }
 
 func (op Operation) Address(operand Address) Address {
-	return Address(op.Operands[operand])
+	return Address(op.Operand[operand])
 }
-
-type Address uint8
 
 type OpCode byte
 
@@ -166,7 +175,7 @@ const (
 )
 
 type Process struct {
-	PC       int
+	PC       LongAddress
 	ByteCode []Operation
 	Register [MAX_WORD]byte
 	Stack    [MAX_WORD][]byte
@@ -178,7 +187,7 @@ func Compile(ast *AST) (*Process, error) {
 }
 
 func (process *Process) IsTerminated() bool {
-	return process.PC >= len(process.ByteCode) || process.Error != nil
+	return process.PC >= LongAddress(len(process.ByteCode)) || process.Error != nil
 }
 
 func (process *Process) ExecuteStep(callTable []RuntimeCall) {
@@ -277,7 +286,7 @@ func (runtime *Runtime) jmpnz(op Operation) {
 	}
 
 	if val != 0 {
-		runtime.Process.PC = op.Operands[1]
+		runtime.Process.PC = op.LongAddress()
 	}
 }
 
