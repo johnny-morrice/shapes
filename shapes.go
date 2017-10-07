@@ -238,6 +238,10 @@ func (process *Process) SetRegister(register Address, val byte) {
 	process.Register[register] = val
 }
 
+func (process *Process) IncrementPC() {
+	process.PC++
+}
+
 type RuntimeCall func(op Operation)
 
 type Runtime struct {
@@ -287,6 +291,8 @@ func (runtime *Runtime) jmpnz(op Operation) {
 
 	if val != 0 {
 		runtime.Process.PC = op.LongAddress()
+	} else {
+		runtime.Process.IncrementPC()
 	}
 }
 
@@ -311,12 +317,14 @@ func (runtime *Runtime) add(op Operation) {
 	runtime.onRegisters(op, func(valZero, valOne byte) byte {
 		return valZero + valOne
 	})
+	runtime.Process.IncrementPC()
 }
 
 func (runtime *Runtime) sub(op Operation) {
 	runtime.onRegisters(op, func(valZero, valOne byte) byte {
 		return valZero - valOne
 	})
+	runtime.Process.IncrementPC()
 }
 
 func (runtime *Runtime) push(op Operation) {
@@ -327,6 +335,7 @@ func (runtime *Runtime) push(op Operation) {
 	}
 
 	runtime.Process.Push(op.Address(0), val)
+	runtime.Process.IncrementPC()
 }
 
 func (runtime *Runtime) pop(op Operation) {
@@ -337,6 +346,7 @@ func (runtime *Runtime) pop(op Operation) {
 	}
 
 	runtime.Process.SetRegister(op.Address(1), tip)
+	runtime.Process.IncrementPC()
 }
 
 func (runtime *Runtime) read(op Operation) {
@@ -350,6 +360,7 @@ func (runtime *Runtime) read(op Operation) {
 	}
 
 	runtime.Process.SetRegister(op.Address(0), runtime.readBuffer[0])
+	runtime.Process.IncrementPC()
 }
 
 func (runtime *Runtime) write(op Operation) {
@@ -364,6 +375,7 @@ func (runtime *Runtime) write(op Operation) {
 		runtime.Process.Error = errors.Wrap(err, errMsg)
 		return
 	}
+	runtime.Process.IncrementPC()
 }
 
 func (runtime *Runtime) copy(op Operation) {
@@ -374,10 +386,12 @@ func (runtime *Runtime) copy(op Operation) {
 	}
 
 	runtime.Process.SetRegister(op.Address(0), val)
+	runtime.Process.IncrementPC()
 }
 
 func (runtime *Runtime) set(op Operation) {
 	runtime.Process.SetRegister(op.Address(0), byte(op.Address(1)))
+	runtime.Process.IncrementPC()
 }
 
 func (runtime *Runtime) Execute() error {
