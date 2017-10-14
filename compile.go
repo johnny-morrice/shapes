@@ -5,8 +5,8 @@ import (
 )
 
 type NameTable struct {
-	NamedRegisters [MAX_WORD]string
-	NamedStacks    [MAX_WORD]string
+	Registers [MAX_WORD]string
+	Stacks    [MAX_WORD]string
 }
 
 type CompileVisitor struct {

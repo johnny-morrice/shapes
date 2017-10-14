@@ -1,15 +1,14 @@
 package shapes
 
 import (
+	"strings"
 	"testing"
 )
-
-var testNameTable NameTable = NameTable{}
 
 func compileHelper(t *testing.T, ast *AST, expected *Process) bool {
 	t.Helper()
 
-	actual, err := Compile(ast, testNameTable)
+	actual, err := Compile(ast, testNameTable())
 
 	if err != nil {
 		t.Errorf("Expected compile success but got error: %s", err.Error())
@@ -27,7 +26,7 @@ func compileHelper(t *testing.T, ast *AST, expected *Process) bool {
 func compileFailureHelper(t *testing.T, ast *AST) bool {
 	t.Helper()
 
-	_, err := Compile(ast, testNameTable)
+	_, err := Compile(ast, testNameTable())
 
 	if err == nil {
 		t.Error("Expected compile failure")
@@ -92,4 +91,22 @@ func TestCompile(t *testing.T) {
 			t.Errorf("Test failure at failure case %d", i)
 		}
 	}
+}
+
+var __testNameTable NameTable = NameTable{}
+
+func testNameTable() NameTable {
+	const registers = "abcdefghijklmnopqrstucwxyz"
+	const stacks = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+	if __testNameTable.Registers[0] == "" {
+		for i, reg := range strings.Split(registers, "") {
+			__testNameTable.Registers[i] = reg
+		}
+
+		for i, stack := range strings.Split(stacks, "") {
+			__testNameTable.Stacks[i] = stack
+		}
+	}
+
+	return __testNameTable
 }
