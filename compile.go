@@ -4,7 +4,13 @@ import (
 	"errors"
 )
 
+type NameTable struct {
+	NamedRegisters [MAX_WORD]string
+	NamedStacks    [MAX_WORD]string
+}
+
 type CompileVisitor struct {
+	NameTable
 	Process *Process
 	Error   error
 }

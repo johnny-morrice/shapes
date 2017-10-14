@@ -4,10 +4,12 @@ import (
 	"testing"
 )
 
+var testNameTable NameTable = NameTable{}
+
 func compileHelper(t *testing.T, ast *AST, expected *Process) bool {
 	t.Helper()
 
-	actual, err := Compile(ast)
+	actual, err := Compile(ast, testNameTable)
 
 	if err != nil {
 		t.Errorf("Expected compile success but got error: %s", err.Error())
@@ -25,7 +27,7 @@ func compileHelper(t *testing.T, ast *AST, expected *Process) bool {
 func compileFailureHelper(t *testing.T, ast *AST) bool {
 	t.Helper()
 
-	_, err := Compile(ast)
+	_, err := Compile(ast, testNameTable)
 
 	if err == nil {
 		t.Error("Expected compile failure")
@@ -75,7 +77,13 @@ func TestCompile(t *testing.T) {
 		}
 	}
 
-	failureCases := []*AST{}
+	unknownRegisterFailure := &AST{}
+	unknownStackFailure := &AST{}
+
+	failureCases := []*AST{
+		unknownRegisterFailure,
+		unknownStackFailure,
+	}
 
 	for i, test := range failureCases {
 		ok := compileFailureHelper(t, test)

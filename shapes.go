@@ -15,7 +15,7 @@ func InterpretProgram(source []byte, input io.Reader, output io.Writer) error {
 		return errors.Wrap(err, errMsg)
 	}
 
-	process, err := Compile(ast)
+	process, err := Compile(ast, defaultNameTable())
 
 	if err != nil {
 		return errors.Wrap(err, errMsg)
@@ -30,4 +30,8 @@ func InterpretProgram(source []byte, input io.Reader, output io.Writer) error {
 	}
 
 	return nil
+}
+
+func defaultNameTable() NameTable {
+	panic("not implemented")
 }
