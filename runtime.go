@@ -51,11 +51,20 @@ type Process struct {
 	Error    error
 }
 
+func MakeProcess(byteCode []Operation) *Process {
+	return &Process{
+		ByteCode: byteCode,
+	}
+}
+
 func Compile(ast *AST) (*Process, error) {
-	// compiler := &CompileVisitor{}
-	// ast.Visit(compiler)
-	//
-	// return compiler.Process, compiler.Error
+	compiler := &CompileVisitor{}
+	ast.Visit(compiler)
+
+	return compiler.Process, compiler.Error
+}
+
+func (process *Process) IsSameByteCode(other *Process) bool {
 	panic("not implemented")
 }
 
