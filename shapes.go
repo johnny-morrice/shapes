@@ -7,7 +7,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-func ExecuteProgramCode(source []byte, input io.Reader, output io.Writer) error {
+func InterpretProgram(source []byte, input io.Reader, output io.Writer) error {
 	const errMsg = "ExecuteProgramCode failed"
 
 	ast, err := Parse(source)
