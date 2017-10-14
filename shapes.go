@@ -32,6 +32,12 @@ func InterpretProgram(source []byte, input io.Reader, output io.Writer) error {
 	return nil
 }
 
+var __defaultNameTable NameTable
+
 func defaultNameTable() NameTable {
-	panic("not implemented")
+	if __defaultNameTable.Registers[0] == "" {
+		// Fill name table
+	}
+
+	return __defaultNameTable
 }
