@@ -18,6 +18,7 @@ func TestCompile(t *testing.T) {
 		writeCompilation(),
 		setRegisterCompilation(),
 		setLiteralCompilation(),
+		loopCompilation(),
 		severalStatementsCompilation(),
 	}
 
@@ -115,6 +116,13 @@ func setRegisterCompilation() compilation {
 }
 
 func setLiteralCompilation() compilation {
+	statements := []Statement{}
+	expected := []Operation{}
+	panic("not implemented")
+	return makeCompilation(statements, expected)
+}
+
+func loopCompilation() compilation {
 	statements := []Statement{}
 	expected := []Operation{}
 	panic("not implemented")
