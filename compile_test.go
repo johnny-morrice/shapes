@@ -5,6 +5,139 @@ import (
 	"testing"
 )
 
+func TestCompile(t *testing.T) {
+	successCases := []compilation{
+		addRegisterCompilation(),
+		addLiteralCompilation(),
+		subRegisterCompilation(),
+		subLiteralCompilation(),
+		pushRegisterCompilation(),
+		pushLiteralCompilation(),
+		popCompilation(),
+		readCompilation(),
+		writeCompilation(),
+		setRegisterCompilation(),
+		setLiteralCompilation(),
+		severalStatementsCompilation(),
+	}
+
+	for i, test := range successCases {
+		ok := compileHelper(t, test.ast, MakeProcess(test.expected))
+
+		if !ok {
+			t.Errorf("Test failure at success case %d", i)
+		}
+	}
+
+	failureCases := []*AST{
+		unknownRegisterFailure(),
+		unknownStackFailure(),
+		programTooBigFailure(),
+	}
+
+	for i, test := range failureCases {
+		ok := compileFailureHelper(t, test)
+
+		if !ok {
+			t.Errorf("Test failure at failure case %d", i)
+		}
+	}
+}
+
+func addRegisterCompilation() compilation {
+	statements := []Statement{}
+	expected := []Operation{}
+	panic("not implemented")
+	return makeCompilation(statements, expected)
+}
+
+func addLiteralCompilation() compilation {
+	statements := []Statement{}
+	expected := []Operation{}
+	panic("not implemented")
+	return makeCompilation(statements, expected)
+}
+
+func subRegisterCompilation() compilation {
+	statements := []Statement{}
+	expected := []Operation{}
+	panic("not implemented")
+	return makeCompilation(statements, expected)
+}
+
+func subLiteralCompilation() compilation {
+	statements := []Statement{}
+	expected := []Operation{}
+	panic("not implemented")
+	return makeCompilation(statements, expected)
+}
+
+func pushRegisterCompilation() compilation {
+	statements := []Statement{}
+	expected := []Operation{}
+	panic("not implemented")
+	return makeCompilation(statements, expected)
+}
+
+func pushLiteralCompilation() compilation {
+	statements := []Statement{}
+	expected := []Operation{}
+	panic("not implemented")
+	return makeCompilation(statements, expected)
+}
+
+func popCompilation() compilation {
+	statements := []Statement{}
+	expected := []Operation{}
+	panic("not implemented")
+	return makeCompilation(statements, expected)
+}
+
+func readCompilation() compilation {
+	statements := []Statement{}
+	expected := []Operation{}
+	panic("not implemented")
+	return makeCompilation(statements, expected)
+}
+
+func writeCompilation() compilation {
+	statements := []Statement{}
+	expected := []Operation{}
+	panic("not implemented")
+	return makeCompilation(statements, expected)
+}
+
+func setRegisterCompilation() compilation {
+	statements := []Statement{}
+	expected := []Operation{}
+	panic("not implemented")
+	return makeCompilation(statements, expected)
+}
+
+func setLiteralCompilation() compilation {
+	statements := []Statement{}
+	expected := []Operation{}
+	panic("not implemented")
+	return makeCompilation(statements, expected)
+}
+
+func severalStatementsCompilation() compilation {
+	statements := []Statement{}
+	expected := []Operation{}
+	panic("not implemented")
+	return makeCompilation(statements, expected)
+}
+
+func unknownRegisterFailure() *AST {
+	panic("not implemented")
+}
+func unknownStackFailure() *AST {
+	panic("not implemented")
+}
+func programTooBigFailure() *AST {
+	panic("not implemented")
+}
+
 func compileHelper(t *testing.T, ast *AST, expected *Process) bool {
 	t.Helper()
 
@@ -41,55 +174,10 @@ type compilation struct {
 	expected []Operation
 }
 
-func TestCompile(t *testing.T) {
-	addRegisterSuccess := compilation{}
-	addLiteralSuccess := compilation{}
-	subRegisterSuccess := compilation{}
-	subLiteralSuccess := compilation{}
-	pushRegisterSuccess := compilation{}
-	pushLiteralSuccess := compilation{}
-	popSuccess := compilation{}
-	readSuccess := compilation{}
-	writeSuccess := compilation{}
-	setRegisterSuccess := compilation{}
-	setLiteralSuccess := compilation{}
-
-	successCases := []compilation{
-		addRegisterSuccess,
-		addLiteralSuccess,
-		subRegisterSuccess,
-		subLiteralSuccess,
-		pushRegisterSuccess,
-		pushLiteralSuccess,
-		popSuccess,
-		readSuccess,
-		writeSuccess,
-		setRegisterSuccess,
-		setLiteralSuccess,
-	}
-
-	for i, test := range successCases {
-		ok := compileHelper(t, test.ast, MakeProcess(test.expected))
-
-		if !ok {
-			t.Errorf("Test failure at success case %d", i)
-		}
-	}
-
-	unknownRegisterFailure := &AST{}
-	unknownStackFailure := &AST{}
-
-	failureCases := []*AST{
-		unknownRegisterFailure,
-		unknownStackFailure,
-	}
-
-	for i, test := range failureCases {
-		ok := compileFailureHelper(t, test)
-
-		if !ok {
-			t.Errorf("Test failure at failure case %d", i)
-		}
+func makeCompilation(statements []Statement, expected []Operation) compilation {
+	return compilation{
+		ast:      &AST{Statements: statements},
+		expected: expected,
 	}
 }
 
