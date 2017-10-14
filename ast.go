@@ -33,8 +33,12 @@ type ASTVisitor interface {
 }
 
 type LoopStmt struct {
+	OneOperandStmt
+	Nest []Statement
+}
+
+type OneOperandStmt struct {
 	Operand string
-	Nest    []Statement
 }
 
 type TwoOperandStmt struct {
@@ -58,11 +62,11 @@ type PopStmt struct {
 }
 
 type ReadStmt struct {
-	TwoOperandStmt
+	OneOperandStmt
 }
 
 type WriteStmt struct {
-	TwoOperandStmt
+	OneOperandStmt
 }
 
 type SetStmt struct {
