@@ -1,4 +1,4 @@
-package shapes
+package asm
 
 type AST struct {
 	Statements []Statement

@@ -2,6 +2,8 @@ package shapes
 
 import (
 	"testing"
+
+	"github.com/johnny-morrice/shapes/asm"
 )
 
 func TestCompile(t *testing.T) {
@@ -29,7 +31,7 @@ func TestCompile(t *testing.T) {
 		}
 	}
 
-	failureCases := []*AST{
+	failureCases := []*asm.AST{
 		unknownRegisterFailure(),
 		unknownStackFailure(),
 		programTooBigFailure(),
@@ -45,107 +47,107 @@ func TestCompile(t *testing.T) {
 }
 
 func addRegisterCompilation() compilation {
-	statements := []Statement{}
+	statements := []asm.Statement{}
 	expected := []Operation{}
 	panic("not implemented")
 	return makeCompilation(statements, expected)
 }
 
 func addLiteralCompilation() compilation {
-	statements := []Statement{}
+	statements := []asm.Statement{}
 	expected := []Operation{}
 	panic("not implemented")
 	return makeCompilation(statements, expected)
 }
 
 func subRegisterCompilation() compilation {
-	statements := []Statement{}
+	statements := []asm.Statement{}
 	expected := []Operation{}
 	panic("not implemented")
 	return makeCompilation(statements, expected)
 }
 
 func subLiteralCompilation() compilation {
-	statements := []Statement{}
+	statements := []asm.Statement{}
 	expected := []Operation{}
 	panic("not implemented")
 	return makeCompilation(statements, expected)
 }
 
 func pushRegisterCompilation() compilation {
-	statements := []Statement{}
+	statements := []asm.Statement{}
 	expected := []Operation{}
 	panic("not implemented")
 	return makeCompilation(statements, expected)
 }
 
 func pushLiteralCompilation() compilation {
-	statements := []Statement{}
+	statements := []asm.Statement{}
 	expected := []Operation{}
 	panic("not implemented")
 	return makeCompilation(statements, expected)
 }
 
 func popCompilation() compilation {
-	statements := []Statement{}
+	statements := []asm.Statement{}
 	expected := []Operation{}
 	panic("not implemented")
 	return makeCompilation(statements, expected)
 }
 
 func readCompilation() compilation {
-	statements := []Statement{}
+	statements := []asm.Statement{}
 	expected := []Operation{}
 	panic("not implemented")
 	return makeCompilation(statements, expected)
 }
 
 func writeCompilation() compilation {
-	statements := []Statement{}
+	statements := []asm.Statement{}
 	expected := []Operation{}
 	panic("not implemented")
 	return makeCompilation(statements, expected)
 }
 
 func setRegisterCompilation() compilation {
-	statements := []Statement{}
+	statements := []asm.Statement{}
 	expected := []Operation{}
 	panic("not implemented")
 	return makeCompilation(statements, expected)
 }
 
 func setLiteralCompilation() compilation {
-	statements := []Statement{}
+	statements := []asm.Statement{}
 	expected := []Operation{}
 	panic("not implemented")
 	return makeCompilation(statements, expected)
 }
 
 func loopCompilation() compilation {
-	statements := []Statement{}
+	statements := []asm.Statement{}
 	expected := []Operation{}
 	panic("not implemented")
 	return makeCompilation(statements, expected)
 }
 
 func severalStatementsCompilation() compilation {
-	statements := []Statement{}
+	statements := []asm.Statement{}
 	expected := []Operation{}
 	panic("not implemented")
 	return makeCompilation(statements, expected)
 }
 
-func unknownRegisterFailure() *AST {
+func unknownRegisterFailure() *asm.AST {
 	panic("not implemented")
 }
-func unknownStackFailure() *AST {
+func unknownStackFailure() *asm.AST {
 	panic("not implemented")
 }
-func programTooBigFailure() *AST {
+func programTooBigFailure() *asm.AST {
 	panic("not implemented")
 }
 
-func compileHelper(t *testing.T, ast *AST, expected *Process) bool {
+func compileHelper(t *testing.T, ast *asm.AST, expected *Process) bool {
 	t.Helper()
 
 	actual, err := Compile(ast)
@@ -163,7 +165,7 @@ func compileHelper(t *testing.T, ast *AST, expected *Process) bool {
 	return true
 }
 
-func compileFailureHelper(t *testing.T, ast *AST) bool {
+func compileFailureHelper(t *testing.T, ast *asm.AST) bool {
 	t.Helper()
 
 	_, err := Compile(ast)
@@ -177,13 +179,13 @@ func compileFailureHelper(t *testing.T, ast *AST) bool {
 }
 
 type compilation struct {
-	ast      *AST
+	ast      *asm.AST
 	expected []Operation
 }
 
-func makeCompilation(statements []Statement, expected []Operation) compilation {
+func makeCompilation(statements []asm.Statement, expected []Operation) compilation {
 	return compilation{
-		ast:      &AST{Statements: statements},
+		ast:      &asm.AST{Statements: statements},
 		expected: expected,
 	}
 }

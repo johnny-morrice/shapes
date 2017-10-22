@@ -15,15 +15,11 @@ package cmd
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
-	"strings"
 
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-
-	"github.com/johnny-morrice/shapes"
 )
 
 var cfgFile string
@@ -31,38 +27,8 @@ var sourceFile string
 
 // RootCmd represents the base command when called without any subcommands
 var RootCmd = &cobra.Command{
-	Use:     "shapes",
-	Short:   "Programming language based on common shapes",
-	Example: "shapes file." + __SHAPE_EXTENSION + " OPTIONS",
-	PreRun: func(cmd *cobra.Command, args []string) {
-		const extension = "." + __SHAPE_EXTENSION
-
-		if len(args) == 0 {
-			dieHelp(cmd)
-		}
-
-		if strings.HasSuffix(args[0], extension) {
-			sourceFile = args[0]
-		}
-	},
-
-	Run: func(cmd *cobra.Command, args []string) {
-		if sourceFile == "" {
-			dieHelp(cmd)
-		}
-
-		source, err := ioutil.ReadFile(sourceFile)
-
-		if err != nil {
-			die(err)
-		}
-
-		err = shapes.InterpretProgram(source, os.Stdin, os.Stdout)
-
-		if err != nil {
-			die(err)
-		}
-	},
+	Use:   "shapes",
+	Short: "Esoteric programming language interpreter",
 }
 
 func dieHelp(cmd *cobra.Command) {
@@ -117,4 +83,3 @@ func initConfig() {
 }
 
 const __EXIT_FAILURE = 1
-const __SHAPE_EXTENSION = "shape"

@@ -4,9 +4,11 @@ import (
 	"io"
 
 	"github.com/pkg/errors"
+
+	"github.com/johnny-morrice/shapes/asm"
 )
 
-func InterpretProgramAST(ast *AST, input io.Reader, output io.Writer) error {
+func InterpretProgramAST(ast *asm.AST, input io.Reader, output io.Writer) error {
 	const errMsg = "ExecuteProgramCode failed"
 
 	process, err := Compile(ast)

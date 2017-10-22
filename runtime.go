@@ -5,6 +5,8 @@ import (
 	"io"
 
 	"github.com/pkg/errors"
+
+	"github.com/johnny-morrice/shapes/asm"
 )
 
 type Address uint8
@@ -55,7 +57,7 @@ func MakeProcess(byteCode []Operation) *Process {
 	}
 }
 
-func Compile(ast *AST) (*Process, error) {
+func Compile(ast *asm.AST) (*Process, error) {
 	compiler := &CompileVisitor{}
 	ast.Visit(compiler)
 
