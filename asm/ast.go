@@ -33,17 +33,17 @@ type ASTVisitor interface {
 	VisitCopy(copy *CopyStmt)
 }
 
-type LoopStmt struct {
-	OneOperandStmt
-	Nest []Statement
-}
-
 type OneOperandStmt struct {
 	Operand byte
 }
 
 type TwoOperandStmt struct {
-	Operands [2]byte
+	Operand [2]byte
+}
+
+type LoopStmt struct {
+	OneOperandStmt
+	Nest []Statement
 }
 
 type AddStmt struct {
@@ -114,4 +114,8 @@ func (stmt *WriteStmt) Visit(visitor ASTVisitor) {
 
 func (stmt *SetStmt) Visit(visitor ASTVisitor) {
 	visitor.VisitSet(stmt)
+}
+
+func (stmt *CopyStmt) Visit(visitor ASTVisitor) {
+	visitor.VisitCopy(stmt)
 }
