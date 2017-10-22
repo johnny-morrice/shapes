@@ -39,8 +39,8 @@ const (
 type Process struct {
 	PC       Address
 	ByteCode []Operation
-	Register [MAX_WORD]byte
-	Stack    [MAX_WORD][]byte
+	Register [REGISTER_COUNT]byte
+	Stack    [REGISTER_COUNT][]byte
 	Error    error
 }
 
@@ -293,4 +293,4 @@ func (runtime *Runtime) Execute() error {
 	return nil
 }
 
-const MAX_WORD = 256
+const REGISTER_COUNT = 256
