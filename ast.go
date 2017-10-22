@@ -38,11 +38,11 @@ type LoopStmt struct {
 }
 
 type OneOperandStmt struct {
-	Operand string
+	Operand byte
 }
 
 type TwoOperandStmt struct {
-	Operands [2]string
+	Operands [2]byte
 }
 
 type AddStmt struct {

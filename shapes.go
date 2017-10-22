@@ -6,16 +6,10 @@ import (
 	"github.com/pkg/errors"
 )
 
-func InterpretProgram(source []byte, input io.Reader, output io.Writer) error {
+func InterpretProgramAST(ast *AST, input io.Reader, output io.Writer) error {
 	const errMsg = "ExecuteProgramCode failed"
 
-	ast, err := Parse(source)
-
-	if err != nil {
-		return errors.Wrap(err, errMsg)
-	}
-
-	process, err := Compile(ast, defaultNameTable())
+	process, err := Compile(ast)
 
 	if err != nil {
 		return errors.Wrap(err, errMsg)
@@ -30,14 +24,4 @@ func InterpretProgram(source []byte, input io.Reader, output io.Writer) error {
 	}
 
 	return nil
-}
-
-var __defaultNameTable NameTable
-
-func defaultNameTable() NameTable {
-	if __defaultNameTable.Registers[0] == "" {
-		// Fill name table
-	}
-
-	return __defaultNameTable
 }

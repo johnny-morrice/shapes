@@ -11,11 +11,9 @@ type Address uint8
 
 type LongAddress uint16
 
-type Operand uint8
-
 type Operation struct {
 	OpCode  OpCode
-	Operand [2]Operand
+	Operand [2]byte
 }
 
 func (op Operation) LongAddress() LongAddress {
@@ -57,10 +55,8 @@ func MakeProcess(byteCode []Operation) *Process {
 	}
 }
 
-func Compile(ast *AST, table NameTable) (*Process, error) {
-	compiler := &CompileVisitor{
-		NameTable: table,
-	}
+func Compile(ast *AST) (*Process, error) {
+	compiler := &CompileVisitor{}
 	ast.Visit(compiler)
 
 	return compiler.Process, compiler.Error

@@ -1,7 +1,6 @@
 package shapes
 
 import (
-	"strings"
 	"testing"
 )
 
@@ -149,7 +148,7 @@ func programTooBigFailure() *AST {
 func compileHelper(t *testing.T, ast *AST, expected *Process) bool {
 	t.Helper()
 
-	actual, err := Compile(ast, testNameTable())
+	actual, err := Compile(ast)
 
 	if err != nil {
 		t.Errorf("Expected compile success but got error: %s", err.Error())
@@ -167,7 +166,7 @@ func compileHelper(t *testing.T, ast *AST, expected *Process) bool {
 func compileFailureHelper(t *testing.T, ast *AST) bool {
 	t.Helper()
 
-	_, err := Compile(ast, testNameTable())
+	_, err := Compile(ast)
 
 	if err == nil {
 		t.Error("Expected compile failure")
@@ -187,22 +186,4 @@ func makeCompilation(statements []Statement, expected []Operation) compilation {
 		ast:      &AST{Statements: statements},
 		expected: expected,
 	}
-}
-
-var __testNameTable NameTable = NameTable{}
-
-func testNameTable() NameTable {
-	const registers = "abcdefghijklmnopqrstucwxyz"
-	const stacks = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-	if __testNameTable.Registers[0] == "" {
-		for i, reg := range strings.Split(registers, "") {
-			__testNameTable.Registers[i] = reg
-		}
-
-		for i, stack := range strings.Split(stacks, "") {
-			__testNameTable.Stacks[i] = stack
-		}
-	}
-
-	return __testNameTable
 }

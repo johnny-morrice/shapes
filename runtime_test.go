@@ -39,8 +39,8 @@ func TestRuntimeExecute(t *testing.T) {
 
 func TestOperationLongAddress(t *testing.T) {
 	op := Operation{}
-	op.Operand[0] = Operand(binary("01101010", 8))
-	op.Operand[1] = Operand(binary("11000101", 8))
+	op.Operand[0] = byte(binary("01101010", 8))
+	op.Operand[1] = byte(binary("11000101", 8))
 	expected := LongAddress(binary("0110101011000101", 16))
 	long := op.LongAddress()
 
@@ -51,11 +51,11 @@ func TestOperationLongAddress(t *testing.T) {
 
 func jmpnzTestData() (cannedProcess, cannedProcess) {
 	byteCode := []Operation{
-		Operation{OpCode: OP_SET, Operand: [2]Operand{0, 10}},
-		Operation{OpCode: OP_SET, Operand: [2]Operand{1, 1}},
-		Operation{OpCode: OP_ADD, Operand: [2]Operand{2, 0}},
-		Operation{OpCode: OP_SUB, Operand: [2]Operand{0, 1}},
-		Operation{OpCode: OP_JMPNZ, Operand: [2]Operand{0, 2}},
+		Operation{OpCode: OP_SET, Operand: [2]byte{0, 10}},
+		Operation{OpCode: OP_SET, Operand: [2]byte{1, 1}},
+		Operation{OpCode: OP_ADD, Operand: [2]byte{2, 0}},
+		Operation{OpCode: OP_SUB, Operand: [2]byte{0, 1}},
+		Operation{OpCode: OP_JMPNZ, Operand: [2]byte{0, 2}},
 	}
 
 	input := makeInputProcess(byteCode, []byte{})
@@ -70,9 +70,9 @@ func jmpnzTestData() (cannedProcess, cannedProcess) {
 
 func addTestData() (cannedProcess, cannedProcess) {
 	byteCode := []Operation{
-		Operation{OpCode: OP_SET, Operand: [2]Operand{0, 10}},
-		Operation{OpCode: OP_SET, Operand: [2]Operand{1, 20}},
-		Operation{OpCode: OP_ADD, Operand: [2]Operand{0, 1}},
+		Operation{OpCode: OP_SET, Operand: [2]byte{0, 10}},
+		Operation{OpCode: OP_SET, Operand: [2]byte{1, 20}},
+		Operation{OpCode: OP_ADD, Operand: [2]byte{0, 1}},
 	}
 
 	input := makeInputProcess(byteCode, []byte{})
@@ -87,9 +87,9 @@ func addTestData() (cannedProcess, cannedProcess) {
 
 func subTestData() (cannedProcess, cannedProcess) {
 	byteCode := []Operation{
-		Operation{OpCode: OP_SET, Operand: [2]Operand{0, 10}},
-		Operation{OpCode: OP_SET, Operand: [2]Operand{1, 20}},
-		Operation{OpCode: OP_SUB, Operand: [2]Operand{1, 0}},
+		Operation{OpCode: OP_SET, Operand: [2]byte{0, 10}},
+		Operation{OpCode: OP_SET, Operand: [2]byte{1, 20}},
+		Operation{OpCode: OP_SUB, Operand: [2]byte{1, 0}},
 	}
 
 	input := makeInputProcess(byteCode, []byte{})
@@ -104,8 +104,8 @@ func subTestData() (cannedProcess, cannedProcess) {
 
 func pushTestData() (cannedProcess, cannedProcess) {
 	byteCode := []Operation{
-		Operation{OpCode: OP_SET, Operand: [2]Operand{1, 20}},
-		Operation{OpCode: OP_PUSH, Operand: [2]Operand{0, 1}},
+		Operation{OpCode: OP_SET, Operand: [2]byte{1, 20}},
+		Operation{OpCode: OP_PUSH, Operand: [2]byte{0, 1}},
 	}
 
 	input := makeInputProcess(byteCode, []byte{})
@@ -121,11 +121,11 @@ func pushTestData() (cannedProcess, cannedProcess) {
 
 func popTestData() (cannedProcess, cannedProcess) {
 	byteCode := []Operation{
-		Operation{OpCode: OP_SET, Operand: [2]Operand{0, 40}},
-		Operation{OpCode: OP_SET, Operand: [2]Operand{1, 20}},
-		Operation{OpCode: OP_PUSH, Operand: [2]Operand{0, 0}},
-		Operation{OpCode: OP_PUSH, Operand: [2]Operand{0, 1}},
-		Operation{OpCode: OP_POP, Operand: [2]Operand{0, 2}},
+		Operation{OpCode: OP_SET, Operand: [2]byte{0, 40}},
+		Operation{OpCode: OP_SET, Operand: [2]byte{1, 20}},
+		Operation{OpCode: OP_PUSH, Operand: [2]byte{0, 0}},
+		Operation{OpCode: OP_PUSH, Operand: [2]byte{0, 1}},
+		Operation{OpCode: OP_POP, Operand: [2]byte{0, 2}},
 	}
 
 	input := makeInputProcess(byteCode, []byte{})
@@ -143,7 +143,7 @@ func popTestData() (cannedProcess, cannedProcess) {
 
 func readTestData() (cannedProcess, cannedProcess) {
 	byteCode := []Operation{
-		Operation{OpCode: OP_READ, Operand: [2]Operand{60, 0}},
+		Operation{OpCode: OP_READ, Operand: [2]byte{60, 0}},
 	}
 
 	input := makeInputProcess(byteCode, []byte{42})
@@ -157,8 +157,8 @@ func readTestData() (cannedProcess, cannedProcess) {
 
 func writeTestData() (cannedProcess, cannedProcess) {
 	byteCode := []Operation{
-		Operation{OpCode: OP_SET, Operand: [2]Operand{50, 10}},
-		Operation{OpCode: OP_WRITE, Operand: [2]Operand{50, 0}},
+		Operation{OpCode: OP_SET, Operand: [2]byte{50, 10}},
+		Operation{OpCode: OP_WRITE, Operand: [2]byte{50, 0}},
 	}
 
 	input := makeInputProcess(byteCode, []byte{})
@@ -173,8 +173,8 @@ func writeTestData() (cannedProcess, cannedProcess) {
 
 func copyTestData() (cannedProcess, cannedProcess) {
 	byteCode := []Operation{
-		Operation{OpCode: OP_SET, Operand: [2]Operand{0, 10}},
-		Operation{OpCode: OP_COPY, Operand: [2]Operand{1, 0}},
+		Operation{OpCode: OP_SET, Operand: [2]byte{0, 10}},
+		Operation{OpCode: OP_COPY, Operand: [2]byte{1, 0}},
 	}
 
 	input := makeInputProcess(byteCode, []byte{})
@@ -189,7 +189,7 @@ func copyTestData() (cannedProcess, cannedProcess) {
 
 func setTestData() (cannedProcess, cannedProcess) {
 	byteCode := []Operation{
-		Operation{OpCode: OP_SET, Operand: [2]Operand{0, 10}},
+		Operation{OpCode: OP_SET, Operand: [2]byte{0, 10}},
 	}
 
 	input := makeInputProcess(byteCode, []byte{})
