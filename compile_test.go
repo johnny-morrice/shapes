@@ -1,6 +1,7 @@
 package shapes
 
 import (
+	"log"
 	"testing"
 
 	"github.com/johnny-morrice/shapes/asm"
@@ -213,7 +214,7 @@ func loopCompilation() compilation {
 		},
 		Operation{
 			OpCode:  OP_JMPNZ,
-			Operand: [2]Operand{8, 0},
+			Operand: [2]Operand{8, 1},
 		},
 	}
 
@@ -282,10 +283,23 @@ func compileHelper(t *testing.T, ast *asm.AST, expected *Process) bool {
 
 	if !expected.IsSameByteCode(actual) {
 		t.Error("Expected same bytecode")
+
+		log.Print("Expected bytecode")
+		logByteCode(expected)
+
+		log.Print("Actual bytecode")
+		logByteCode(actual)
+
 		return false
 	}
 
 	return true
+}
+
+func logByteCode(process *Process) {
+	for i, byteCode := range process.ByteCode {
+		log.Printf("%d %v", i, byteCode)
+	}
 }
 
 func compileFailureHelper(t *testing.T, ast *asm.AST) bool {

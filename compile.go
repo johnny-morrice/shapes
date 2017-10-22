@@ -16,6 +16,7 @@ type CompileVisitor struct {
 }
 
 func (c *CompileVisitor) VisitAST(ast *asm.AST) {
+	c.Process = &Process{}
 }
 
 func (c *CompileVisitor) LeaveAST(ast *asm.AST) {
@@ -23,7 +24,7 @@ func (c *CompileVisitor) LeaveAST(ast *asm.AST) {
 }
 
 func (c *CompileVisitor) VisitLoop(l *asm.LoopStmt) {
-	startAddress := len(c.Process.ByteCode) + 1
+	startAddress := len(c.Process.ByteCode)
 	c.loopStack.startAddress = append(c.loopStack.startAddress, startAddress)
 }
 

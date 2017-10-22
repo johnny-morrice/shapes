@@ -58,7 +58,19 @@ func Compile(ast *asm.AST) (*Process, error) {
 }
 
 func (process *Process) IsSameByteCode(other *Process) bool {
-	panic("not implemented")
+	if len(process.ByteCode) != len(other.ByteCode) {
+		return false
+	}
+
+	for i, myByteCode := range process.ByteCode {
+		theirByteCode := other.ByteCode[i]
+
+		if myByteCode != theirByteCode {
+			return false
+		}
+	}
+
+	return true
 }
 
 func (process *Process) IsTerminated() bool {
