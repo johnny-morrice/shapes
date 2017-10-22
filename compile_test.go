@@ -51,7 +51,7 @@ func addRegisterCompilation() compilation {
 	expected := []Operation{
 		Operation{
 			OpCode:  OP_ADD,
-			Operand: [2]byte{68, 99},
+			Operand: [2]Operand{68, 99},
 		},
 	}
 	return makeCompilation(statements, expected)
@@ -68,7 +68,7 @@ func subRegisterCompilation() compilation {
 	expected := []Operation{
 		Operation{
 			OpCode:  OP_SUB,
-			Operand: [2]byte{31, 243},
+			Operand: [2]Operand{31, 243},
 		},
 	}
 	return makeCompilation(statements, expected)
@@ -85,7 +85,7 @@ func pushRegisterCompilation() compilation {
 	expected := []Operation{
 		Operation{
 			OpCode:  OP_PUSH,
-			Operand: [2]byte{67, 123},
+			Operand: [2]Operand{67, 123},
 		},
 	}
 	return makeCompilation(statements, expected)
@@ -102,7 +102,7 @@ func popCompilation() compilation {
 	expected := []Operation{
 		Operation{
 			OpCode:  OP_POP,
-			Operand: [2]byte{90, 80},
+			Operand: [2]Operand{90, 80},
 		},
 	}
 	return makeCompilation(statements, expected)
@@ -118,7 +118,7 @@ func readCompilation() compilation {
 	expected := []Operation{
 		Operation{
 			OpCode:  OP_READ,
-			Operand: [2]byte{8},
+			Operand: [2]Operand{8},
 		},
 	}
 	return makeCompilation(statements, expected)
@@ -134,7 +134,7 @@ func writeCompilation() compilation {
 	expected := []Operation{
 		Operation{
 			OpCode:  OP_WRITE,
-			Operand: [2]byte{8},
+			Operand: [2]Operand{8},
 		},
 	}
 	return makeCompilation(statements, expected)
@@ -151,7 +151,7 @@ func setRegisterCompilation() compilation {
 	expected := []Operation{
 		Operation{
 			OpCode:  OP_SET,
-			Operand: [2]byte{1, 20},
+			Operand: [2]Operand{1, 20},
 		},
 	}
 	return makeCompilation(statements, expected)
@@ -168,7 +168,7 @@ func copyRegisterCompilation() compilation {
 	expected := []Operation{
 		Operation{
 			OpCode:  OP_COPY,
-			Operand: [2]byte{255, 34},
+			Operand: [2]Operand{255, 34},
 		},
 	}
 	return makeCompilation(statements, expected)
@@ -201,19 +201,19 @@ func loopCompilation() compilation {
 	expected := []Operation{
 		Operation{
 			OpCode:  OP_SET,
-			Operand: [2]byte{8, 10},
+			Operand: [2]Operand{8, 10},
 		},
 		Operation{
 			OpCode:  OP_WRITE,
-			Operand: [2]byte{8, 0},
+			Operand: [2]Operand{8, 0},
 		},
 		Operation{
 			OpCode:  OP_SUB,
-			Operand: [2]byte{8, 1},
+			Operand: [2]Operand{8, 1},
 		},
 		Operation{
 			OpCode:  OP_JMPNZ,
-			Operand: [2]byte{8, 0},
+			Operand: [2]Operand{8, 0},
 		},
 	}
 
@@ -241,15 +241,15 @@ func severalStatementsCompilation() compilation {
 	expected := []Operation{
 		Operation{
 			OpCode:  OP_WRITE,
-			Operand: [2]byte{90, 0},
+			Operand: [2]Operand{90, 0},
 		},
 		Operation{
 			OpCode:  OP_SUB,
-			Operand: [2]byte{32, 15},
+			Operand: [2]Operand{32, 15},
 		},
 		Operation{
 			OpCode:  OP_SET,
-			Operand: [2]byte{56, 22},
+			Operand: [2]Operand{56, 22},
 		},
 	}
 	return makeCompilation(statements, expected)

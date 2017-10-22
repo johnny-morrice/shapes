@@ -9,20 +9,13 @@ import (
 	"github.com/johnny-morrice/shapes/asm"
 )
 
-type Address uint8
+type Address uint16
 
-type LongAddress uint16
+type Operand uint16
 
 type Operation struct {
 	OpCode  OpCode
-	Operand [2]byte
-}
-
-func (op Operation) LongAddress() LongAddress {
-	long := LongAddress(op.Operand[0])
-	long = long << 8
-	long = long | LongAddress(op.Operand[1])
-	return long
+	Operand [2]Operand
 }
 
 func (op Operation) Address(operand Address) Address {
@@ -44,7 +37,7 @@ const (
 )
 
 type Process struct {
-	PC       LongAddress
+	PC       Address
 	ByteCode []Operation
 	Register [MAX_WORD]byte
 	Stack    [MAX_WORD][]byte
@@ -69,7 +62,7 @@ func (process *Process) IsSameByteCode(other *Process) bool {
 }
 
 func (process *Process) IsTerminated() bool {
-	return process.PC >= LongAddress(len(process.ByteCode)) || process.Error != nil
+	return int(process.PC) >= len(process.ByteCode) || process.Error != nil
 }
 
 func (process *Process) ExecuteStep(callTable []RuntimeCall) {
@@ -172,7 +165,7 @@ func (runtime *Runtime) jmpnz(op Operation) {
 	}
 
 	if val != 0 {
-		runtime.Process.PC = op.LongAddress()
+		runtime.Process.PC = op.Address(1)
 	} else {
 		runtime.Process.IncrementPC()
 	}
