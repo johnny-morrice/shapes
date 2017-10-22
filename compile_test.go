@@ -9,16 +9,12 @@ import (
 func TestCompile(t *testing.T) {
 	successCases := []compilation{
 		addRegisterCompilation(),
-		addLiteralCompilation(),
 		subRegisterCompilation(),
-		subLiteralCompilation(),
 		pushRegisterCompilation(),
-		pushLiteralCompilation(),
 		popCompilation(),
 		readCompilation(),
 		writeCompilation(),
 		setRegisterCompilation(),
-		setLiteralCompilation(),
 		loopCompilation(),
 		severalStatementsCompilation(),
 	}
@@ -53,13 +49,6 @@ func addRegisterCompilation() compilation {
 	return makeCompilation(statements, expected)
 }
 
-func addLiteralCompilation() compilation {
-	statements := []asm.Statement{}
-	expected := []Operation{}
-	panic("not implemented")
-	return makeCompilation(statements, expected)
-}
-
 func subRegisterCompilation() compilation {
 	statements := []asm.Statement{}
 	expected := []Operation{}
@@ -67,21 +56,7 @@ func subRegisterCompilation() compilation {
 	return makeCompilation(statements, expected)
 }
 
-func subLiteralCompilation() compilation {
-	statements := []asm.Statement{}
-	expected := []Operation{}
-	panic("not implemented")
-	return makeCompilation(statements, expected)
-}
-
 func pushRegisterCompilation() compilation {
-	statements := []asm.Statement{}
-	expected := []Operation{}
-	panic("not implemented")
-	return makeCompilation(statements, expected)
-}
-
-func pushLiteralCompilation() compilation {
 	statements := []asm.Statement{}
 	expected := []Operation{}
 	panic("not implemented")
@@ -116,7 +91,7 @@ func setRegisterCompilation() compilation {
 	return makeCompilation(statements, expected)
 }
 
-func setLiteralCompilation() compilation {
+func copyRegisterCompilation() compilation {
 	statements := []asm.Statement{}
 	expected := []Operation{}
 	panic("not implemented")

@@ -30,6 +30,7 @@ type ASTVisitor interface {
 	VisitRead(read *ReadStmt)
 	VisitWrite(write *WriteStmt)
 	VisitSet(set *SetStmt)
+	VisitCopy(copy *CopyStmt)
 }
 
 type LoopStmt struct {
@@ -70,6 +71,10 @@ type WriteStmt struct {
 }
 
 type SetStmt struct {
+	TwoOperandStmt
+}
+
+type CopyStmt struct {
 	TwoOperandStmt
 }
 
