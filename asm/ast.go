@@ -34,11 +34,11 @@ type ASTVisitor interface {
 }
 
 type OneOperandStmt struct {
-	Operand byte
+	Operand int
 }
 
 type TwoOperandStmt struct {
-	Operand [2]byte
+	Operand [2]int
 }
 
 type LoopStmt struct {

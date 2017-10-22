@@ -9,9 +9,9 @@ import (
 	"github.com/johnny-morrice/shapes/asm"
 )
 
-type Address uint16
+type Address uint64
 
-type Operand uint16
+type Operand uint64
 
 type Operation struct {
 	OpCode  OpCode
