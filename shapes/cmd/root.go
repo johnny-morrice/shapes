@@ -16,6 +16,7 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
@@ -23,24 +24,41 @@ import (
 )
 
 var cfgFile string
-var sourceFile string
 
 // RootCmd represents the base command when called without any subcommands
 var RootCmd = &cobra.Command{
 	Use:   "shapes",
 	Short: "Esoteric programming language interpreter",
+	// Later we'll support more languages, but just hardcode brainfuck now.
+	Example: "shapes prog." + __BRAINFUCK_EXTENSION,
+	Args:    cobra.ExactArgs(1),
+	PreRun: func(cmd *cobra.Command, args []string) {
+		const extension = "." + __BRAINFUCK_EXTENSION
+
+		if len(args) == 0 {
+			dieHelp(cmd)
+		}
+
+		if strings.HasSuffix(args[0], extension) {
+			sourceFile = args[0]
+		} else {
+			dieHelp(cmd)
+		}
+	},
+	Run: runBrainfuck,
 }
 
 func dieHelp(cmd *cobra.Command) {
 	err := cmd.Usage()
 
-	if err != nil {
-		die(err)
-	}
+	die(err)
 }
 
 func die(err error) {
-	fmt.Fprintln(os.Stderr, err.Error())
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err.Error())
+	}
+
 	os.Exit(__EXIT_FAILURE)
 }
 

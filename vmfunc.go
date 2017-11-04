@@ -18,6 +18,10 @@ func (lib *Library) AddLibrary(other *Library) {
 }
 
 func (lib *Library) AddFunction(name string, vmFunc VmFunction) {
+	if lib.index == nil {
+		lib.index = map[string]int{}
+	}
+
 	index := len(lib.Functions)
 	lib.Functions = append(lib.Functions, vmFunc)
 	lib.index[name] = index
