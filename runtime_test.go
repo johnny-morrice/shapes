@@ -16,6 +16,7 @@ func TestRuntimeExecute(t *testing.T) {
 	copyInput, copyExpect := copyTestData()
 	setInput, setExpect := setTestData()
 	jmpnzInput, jmpnzExpect := jmpnzTestData()
+	callInput, callExpect := callVmFuncTestData()
 
 	table := [][2]cannedProcess{
 		[2]cannedProcess{addInput, addExpect},
@@ -27,6 +28,7 @@ func TestRuntimeExecute(t *testing.T) {
 		[2]cannedProcess{copyInput, copyExpect},
 		[2]cannedProcess{setInput, setExpect},
 		[2]cannedProcess{jmpnzInput, jmpnzExpect},
+		[2]cannedProcess{callInput, callExpect},
 	}
 
 	for i, test := range table {
@@ -52,6 +54,23 @@ func jmpnzTestData() (cannedProcess, cannedProcess) {
 	register[1] = 1
 	register[2] = 55
 	expect := makeExpectProcess(byteCode, register, [REGISTER_COUNT][]uint64{}, []byte{})
+
+	return input, expect
+}
+
+func callVmFuncTestData() (cannedProcess, cannedProcess) {
+	byteCode := []Operation{
+		Operation{OpCode: OP_CALL, Operand: [2]Operand{0, 0}},
+		Operation{OpCode: OP_CALL, Operand: [2]Operand{1, 1}},
+	}
+
+	input := makeInputProcess(byteCode, []byte{})
+
+	stack := [REGISTER_COUNT][]uint64{}
+	stack[0] = []uint64{1}
+	stack[1] = []uint64{2}
+
+	expect := makeExpectProcess(byteCode, [REGISTER_COUNT]uint64{}, stack, []byte{})
 
 	return input, expect
 }
@@ -232,7 +251,7 @@ func (canned cannedProcess) makeRuntime() *Runtime {
 		Process: canned.process,
 		Input:   canned.input,
 		Output:  canned.output,
-		// Functions: getTestLib().functions(),
+		Library: LibTest(),
 	}
 	return builder.Build()
 }
