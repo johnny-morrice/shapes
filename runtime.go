@@ -113,7 +113,7 @@ func (process *Process) Pop(stackAddr Address) uint64 {
 }
 
 func (process *Process) failEmptyStack(stackAddr Address) {
-	process.Error = fmt.Errorf("stack was empty '%d'", stackAddr)
+	process.Error = fmt.Errorf("stack %d was empty", stackAddr)
 }
 
 func (process *Process) Push(stackAddr Address, tip uint64) {
