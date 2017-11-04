@@ -27,15 +27,19 @@ func Parse(source []byte) (*asm.AST, error) {
 	newTape := &asm.CallStmt{
 		VmFunc: asm.TAPE_NEW,
 	}
+	newTape.Operand = __STACK_INDEX
 	moveTape := &asm.CallStmt{
 		VmFunc: asm.TAPE_MOVE_HEAD,
 	}
+	moveTape.Operand = __STACK_INDEX
 	writeTape := &asm.CallStmt{
 		VmFunc: asm.TAPE_WRITE_HEAD,
 	}
+	writeTape.Operand = __STACK_INDEX
 	readTape := &asm.CallStmt{
 		VmFunc: asm.TAPE_READ_HEAD,
 	}
+	readTape.Operand = __STACK_INDEX
 
 	pushTapeLeft := &asm.PushStmt{}
 	pushTapeLeft.Operand[0] = __STACK_INDEX

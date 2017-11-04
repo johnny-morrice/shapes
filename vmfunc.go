@@ -37,6 +37,16 @@ func (lib *Library) GetFunctionIndex(name string) (int, error) {
 	return 0, fmt.Errorf("Unknown function '%s'", name)
 }
 
+func (lib *Library) GetFunctionName(index int) (string, error) {
+	for name, i := range lib.index {
+		if index == i {
+			return name, nil
+		}
+	}
+
+	return "", fmt.Errorf("No function at index %d", index)
+}
+
 func (lib *Library) GetFunction(name string) (VmFunction, error) {
 	index, err := lib.GetFunctionIndex(name)
 

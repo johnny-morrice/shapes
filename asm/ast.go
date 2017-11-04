@@ -142,6 +142,7 @@ type JumpStmt struct {
 
 type CallStmt struct {
 	VmFunc string
+	OneOperandStmt
 }
 
 func (stmt *LoopStmt) Visit(visitor ASTVisitor) {

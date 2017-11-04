@@ -18,10 +18,10 @@ func InterpretProgramAST(ast *asm.AST, input io.Reader, output io.Writer) error 
 	}
 
 	builder := &RuntimeBuilder{
-		Process:   process,
-		Input:     input,
-		Output:    output,
-		Functions: StdLib().Functions,
+		Process: process,
+		Input:   input,
+		Output:  output,
+		Library: StdLib(),
 	}
 
 	runtime := builder.Build()

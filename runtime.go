@@ -1,8 +1,10 @@
 package shapes
 
 import (
+	"bufio"
 	"fmt"
 	"io"
+	"os"
 
 	"github.com/pkg/errors"
 
@@ -16,6 +18,10 @@ type Operand uint64
 type Operation struct {
 	OpCode  OpCode
 	Operand [2]Operand
+}
+
+func (op Operation) String() string {
+	return fmt.Sprintf("%v %d %d", op.OpCode, op.Operand[0], op.Operand[1])
 }
 
 func (op Operation) Address(operand Address) Address {
@@ -36,6 +42,23 @@ const (
 	OP_SET
 	OP_CALL
 )
+
+var __OPCODE_STRING = []string{
+	"JMPNZ",
+	"ADD",
+	"SUB",
+	"PUSH",
+	"POP",
+	"READ",
+	"WRITE",
+	"COPY",
+	"SET",
+	"CALL",
+}
+
+func (opCode OpCode) String() string {
+	return __OPCODE_STRING[opCode]
+}
 
 type Process struct {
 	PC       Address
@@ -58,6 +81,18 @@ func Compile(ast *asm.AST, lib *Library) (*Process, error) {
 	ast.Visit(compiler)
 
 	return compiler.Process, compiler.Error
+}
+
+func (process *Process) DebugDump(w io.Writer) {
+	intPC := int(process.PC)
+	for i, op := range process.ByteCode {
+		fmt.Fprint(w, i)
+		if i == intPC {
+			fmt.Fprint(w, " *")
+		}
+		fmt.Fprintf(w, " %v", op)
+		fmt.Fprint(w, "\n")
+	}
 }
 
 func (process *Process) IsSameByteCode(other *Process) bool {
@@ -143,10 +178,10 @@ type Runtime struct {
 }
 
 type RuntimeBuilder struct {
-	Process   *Process
-	Functions []VmFunction
-	Input     io.Reader
-	Output    io.Writer
+	Process *Process
+	Library *Library
+	Input   io.Reader
+	Output  io.Writer
 }
 
 func (builder *RuntimeBuilder) Build() *Runtime {
@@ -289,7 +324,7 @@ func (runtime *Runtime) set(op Operation) {
 }
 
 func (runtime *Runtime) call(op Operation) {
-	callee := runtime.Functions[op.Operand[0]]
+	callee := runtime.Library.Functions[op.Operand[0]]
 	runtime.Process.Push(op.Address(1), uint64(runtime.Process.PC))
 	callee(runtime, op.Address(1))
 	// Callee moves PC.
@@ -301,10 +336,31 @@ func (runtime *Runtime) Execute() error {
 	}
 
 	if runtime.Process.Error != nil {
+		// Maybe we should expose an error buffer to the process too.
+		runtime.DebugDump(os.Stderr)
 		return runtime.Process.Error
 	}
 
 	return nil
+}
+
+func (runtime *Runtime) DebugDump(w io.Writer) {
+	buff := bufio.NewWriter(os.Stderr)
+	fmt.Fprint(w, "FUNCTION MAP:\n")
+
+	for i, _ := range runtime.Library.Functions {
+		fname, err := runtime.Library.GetFunctionName(i)
+
+		if err == nil {
+			fmt.Fprintf(w, "%d %s\n", i, fname)
+		} else {
+			fmt.Fprintf(w, "%d UNKNOWN FUNCTION\n")
+		}
+	}
+
+	fmt.Fprint(w, "BYTECODE:\n")
+	runtime.Process.DebugDump(buff)
+	buff.Flush()
 }
 
 const REGISTER_COUNT = 256
