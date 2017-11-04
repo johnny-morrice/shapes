@@ -36,3 +36,13 @@ func (lib *Library) GetFunction(name string) (VmFunction, error) {
 
 	return lib.Functions[index], nil
 }
+
+var __STD_LIB *Library
+
+func StdLib() *Library {
+	if __STD_LIB == nil {
+		__STD_LIB = &Library{}
+	}
+
+	return __STD_LIB
+}

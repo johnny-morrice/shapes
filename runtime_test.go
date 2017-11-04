@@ -48,10 +48,10 @@ func jmpnzTestData() (cannedProcess, cannedProcess) {
 
 	input := makeInputProcess(byteCode, []byte{})
 
-	register := [REGISTER_COUNT]byte{}
+	register := [REGISTER_COUNT]uint64{}
 	register[1] = 1
 	register[2] = 55
-	expect := makeExpectProcess(byteCode, register, [REGISTER_COUNT][]byte{}, []byte{})
+	expect := makeExpectProcess(byteCode, register, [REGISTER_COUNT][]uint64{}, []byte{})
 
 	return input, expect
 }
@@ -65,10 +65,10 @@ func addTestData() (cannedProcess, cannedProcess) {
 
 	input := makeInputProcess(byteCode, []byte{})
 
-	register := [REGISTER_COUNT]byte{}
+	register := [REGISTER_COUNT]uint64{}
 	register[0] = 30
 	register[1] = 20
-	expect := makeExpectProcess(byteCode, register, [REGISTER_COUNT][]byte{}, []byte{})
+	expect := makeExpectProcess(byteCode, register, [REGISTER_COUNT][]uint64{}, []byte{})
 
 	return input, expect
 }
@@ -82,10 +82,10 @@ func subTestData() (cannedProcess, cannedProcess) {
 
 	input := makeInputProcess(byteCode, []byte{})
 
-	register := [REGISTER_COUNT]byte{}
+	register := [REGISTER_COUNT]uint64{}
 	register[0] = 10
 	register[1] = 10
-	expect := makeExpectProcess(byteCode, register, [REGISTER_COUNT][]byte{}, []byte{})
+	expect := makeExpectProcess(byteCode, register, [REGISTER_COUNT][]uint64{}, []byte{})
 
 	return input, expect
 }
@@ -98,10 +98,10 @@ func pushTestData() (cannedProcess, cannedProcess) {
 
 	input := makeInputProcess(byteCode, []byte{})
 
-	register := [REGISTER_COUNT]byte{}
+	register := [REGISTER_COUNT]uint64{}
 	register[1] = 20
-	stack := [REGISTER_COUNT][]byte{}
-	stack[0] = []byte{20}
+	stack := [REGISTER_COUNT][]uint64{}
+	stack[0] = []uint64{20}
 	expect := makeExpectProcess(byteCode, register, stack, []byte{})
 
 	return input, expect
@@ -118,12 +118,12 @@ func popTestData() (cannedProcess, cannedProcess) {
 
 	input := makeInputProcess(byteCode, []byte{})
 
-	register := [REGISTER_COUNT]byte{}
+	register := [REGISTER_COUNT]uint64{}
 	register[0] = 40
 	register[1] = 20
 	register[2] = 20
-	stack := [REGISTER_COUNT][]byte{}
-	stack[0] = []byte{40}
+	stack := [REGISTER_COUNT][]uint64{}
+	stack[0] = []uint64{40}
 	expect := makeExpectProcess(byteCode, register, stack, []byte{})
 
 	return input, expect
@@ -136,9 +136,9 @@ func readTestData() (cannedProcess, cannedProcess) {
 
 	input := makeInputProcess(byteCode, []byte{42})
 
-	register := [REGISTER_COUNT]byte{}
+	register := [REGISTER_COUNT]uint64{}
 	register[60] = 42
-	expect := makeExpectProcess(byteCode, register, [REGISTER_COUNT][]byte{}, []byte{})
+	expect := makeExpectProcess(byteCode, register, [REGISTER_COUNT][]uint64{}, []byte{})
 
 	return input, expect
 }
@@ -151,10 +151,10 @@ func writeTestData() (cannedProcess, cannedProcess) {
 
 	input := makeInputProcess(byteCode, []byte{})
 
-	register := [REGISTER_COUNT]byte{}
+	register := [REGISTER_COUNT]uint64{}
 	register[50] = 10
 	output := []byte{10}
-	expect := makeExpectProcess(byteCode, register, [REGISTER_COUNT][]byte{}, output)
+	expect := makeExpectProcess(byteCode, register, [REGISTER_COUNT][]uint64{}, output)
 
 	return input, expect
 }
@@ -167,10 +167,10 @@ func copyTestData() (cannedProcess, cannedProcess) {
 
 	input := makeInputProcess(byteCode, []byte{})
 
-	register := [REGISTER_COUNT]byte{}
+	register := [REGISTER_COUNT]uint64{}
 	register[0] = 10
 	register[1] = 10
-	expect := makeExpectProcess(byteCode, register, [REGISTER_COUNT][]byte{}, []byte{})
+	expect := makeExpectProcess(byteCode, register, [REGISTER_COUNT][]uint64{}, []byte{})
 
 	return input, expect
 }
@@ -182,9 +182,9 @@ func setTestData() (cannedProcess, cannedProcess) {
 
 	input := makeInputProcess(byteCode, []byte{})
 
-	register := [REGISTER_COUNT]byte{}
+	register := [REGISTER_COUNT]uint64{}
 	register[0] = 10
-	expect := makeExpectProcess(byteCode, register, [REGISTER_COUNT][]byte{}, []byte{})
+	expect := makeExpectProcess(byteCode, register, [REGISTER_COUNT][]uint64{}, []byte{})
 
 	return input, expect
 }
@@ -215,7 +215,7 @@ func makeInputProcess(byteCode []Operation, input []byte) cannedProcess {
 	}
 }
 
-func makeExpectProcess(byteCode []Operation, register [REGISTER_COUNT]byte, stack [REGISTER_COUNT][]byte, output []byte) cannedProcess {
+func makeExpectProcess(byteCode []Operation, register [REGISTER_COUNT]uint64, stack [REGISTER_COUNT][]uint64, output []byte) cannedProcess {
 	return cannedProcess{
 		process: &Process{
 			ByteCode: byteCode,

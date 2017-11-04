@@ -40,8 +40,8 @@ const (
 type Process struct {
 	PC       Address
 	ByteCode []Operation
-	Register [REGISTER_COUNT]byte
-	Stack    [REGISTER_COUNT][]byte
+	Register [REGISTER_COUNT]uint64
+	Stack    [REGISTER_COUNT][]uint64
 	Error    error
 }
 
@@ -86,7 +86,7 @@ func (process *Process) ExecuteStep(callTable []RuntimeCall) {
 	impl(op)
 }
 
-func (process *Process) Peek(stackAddr Address) byte {
+func (process *Process) Peek(stackAddr Address) uint64 {
 	stack := process.Stack[stackAddr]
 
 	if len(stack) == 0 {
@@ -97,7 +97,7 @@ func (process *Process) Peek(stackAddr Address) byte {
 	return stack[len(stack)-1]
 }
 
-func (process *Process) Pop(stackAddr Address) byte {
+func (process *Process) Pop(stackAddr Address) uint64 {
 	tip := process.Peek(stackAddr)
 
 	if process.Error != nil {
@@ -114,15 +114,15 @@ func (process *Process) failEmptyStack(stackAddr Address) {
 	process.Error = fmt.Errorf("stack was empty '%d'", stackAddr)
 }
 
-func (process *Process) Push(stackAddr Address, tip byte) {
+func (process *Process) Push(stackAddr Address, tip uint64) {
 	process.Stack[stackAddr] = append(process.Stack[stackAddr], tip)
 }
 
-func (process *Process) GetRegister(register Address) byte {
+func (process *Process) GetRegister(register Address) uint64 {
 	return process.Register[register]
 }
 
-func (process *Process) SetRegister(register Address, val byte) {
+func (process *Process) SetRegister(register Address, val uint64) {
 	process.Register[register] = val
 }
 
@@ -188,7 +188,7 @@ func (runtime *Runtime) jmpnz(op Operation) {
 	}
 }
 
-func (runtime *Runtime) onRegisters(op Operation, f func(valZero, valOne byte) byte) {
+func (runtime *Runtime) onRegisters(op Operation, f func(valZero, valOne uint64) uint64) {
 	valZero := runtime.Process.GetRegister(op.Address(0))
 
 	if runtime.hasError() {
@@ -206,14 +206,14 @@ func (runtime *Runtime) onRegisters(op Operation, f func(valZero, valOne byte) b
 }
 
 func (runtime *Runtime) add(op Operation) {
-	runtime.onRegisters(op, func(valZero, valOne byte) byte {
+	runtime.onRegisters(op, func(valZero, valOne uint64) uint64 {
 		return valZero + valOne
 	})
 	runtime.Process.IncrementPC()
 }
 
 func (runtime *Runtime) sub(op Operation) {
-	runtime.onRegisters(op, func(valZero, valOne byte) byte {
+	runtime.onRegisters(op, func(valZero, valOne uint64) uint64 {
 		return valZero - valOne
 	})
 	runtime.Process.IncrementPC()
@@ -251,7 +251,7 @@ func (runtime *Runtime) read(op Operation) {
 		return
 	}
 
-	runtime.Process.SetRegister(op.Address(0), runtime.readBuffer[0])
+	runtime.Process.SetRegister(op.Address(0), uint64(runtime.readBuffer[0]))
 	runtime.Process.IncrementPC()
 }
 
@@ -259,7 +259,7 @@ func (runtime *Runtime) write(op Operation) {
 	const errMsg = "Runtime.Write failed"
 
 	val := runtime.Process.GetRegister(op.Address(0))
-	runtime.writeBuffer[0] = val
+	runtime.writeBuffer[0] = byte(val)
 
 	_, err := runtime.Output.Write(runtime.writeBuffer)
 
@@ -282,7 +282,7 @@ func (runtime *Runtime) copy(op Operation) {
 }
 
 func (runtime *Runtime) set(op Operation) {
-	runtime.Process.SetRegister(op.Address(0), byte(op.Operand[1]))
+	runtime.Process.SetRegister(op.Address(0), uint64(op.Operand[1]))
 	runtime.Process.IncrementPC()
 }
 
