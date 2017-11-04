@@ -1,7 +1,9 @@
 package asm
 
 import (
+	"bytes"
 	"errors"
+	"fmt"
 )
 
 type block struct {
@@ -26,6 +28,7 @@ func (builder *ASTBuilder) OpenLoop(operand int) {
 
 	loop := &LoopStmt{}
 	loop.Operand = operand
+	builder.appendToBlock(loop)
 	blk := block{statements: &loop.Nest}
 	builder.stack = append(builder.stack, blk)
 }
@@ -68,6 +71,20 @@ func (ast *AST) Visit(visitor ASTVisitor) {
 	}
 
 	visitor.LeaveAST(ast)
+}
+
+// FIXME use proper pretty printer with indentation.
+func (ast *AST) String() string {
+	buff := &bytes.Buffer{}
+	buff.WriteString("AST { ")
+
+	for _, stmt := range ast.Statements {
+		buff.WriteString(fmt.Sprint(stmt))
+		buff.WriteRune(' ')
+	}
+	buff.WriteRune('}')
+
+	return buff.String()
 }
 
 type Statement interface {
@@ -193,4 +210,48 @@ func (stmt *JumpStmt) Visit(visitor ASTVisitor) {
 
 func (stmt *CallStmt) Visit(visitor ASTVisitor) {
 	visitor.VisitCall(stmt)
+}
+
+func (loop *LoopStmt) String() string {
+	buff := &bytes.Buffer{}
+	buff.WriteString(fmt.Sprintf("Loop(%d) { ", loop.Operand))
+
+	for _, stmt := range loop.Nest {
+		buff.WriteString(fmt.Sprint(stmt))
+		buff.WriteRune(' ')
+	}
+	buff.WriteString("};")
+
+	return buff.String()
+}
+
+func (stmt *AddStmt) String() string {
+	return fmt.Sprintf("Add(%d, %d);", stmt.Operand[0], stmt.Operand[1])
+}
+func (stmt *SubStmt) String() string {
+	return fmt.Sprintf("Sub(%d, %d);", stmt.Operand[0], stmt.Operand[1])
+}
+func (stmt *PushStmt) String() string {
+	return fmt.Sprintf("Push(%d, %d);", stmt.Operand[0], stmt.Operand[1])
+}
+func (stmt *PopStmt) String() string {
+	return fmt.Sprintf("Pop(%d, %d);", stmt.Operand[0], stmt.Operand[1])
+}
+func (stmt *ReadStmt) String() string {
+	return fmt.Sprintf("Read(%d);", stmt.Operand)
+}
+func (stmt *WriteStmt) String() string {
+	return fmt.Sprintf("Write(%d);", stmt.Operand)
+}
+func (stmt *SetStmt) String() string {
+	return fmt.Sprintf("Set(%d, %d);", stmt.Operand[0], stmt.Operand[1])
+}
+func (stmt *CopyStmt) String() string {
+	return fmt.Sprintf("Copy(%d, %d);", stmt.Operand[0], stmt.Operand[1])
+}
+func (stmt *JumpStmt) String() string {
+	return fmt.Sprintf("Jump(%d, %d);", stmt.Operand[0], stmt.Operand[1])
+}
+func (stmt *CallStmt) String() string {
+	return fmt.Sprintf("Call(%s, %d);", stmt.VmFunc, stmt.Operand)
 }
