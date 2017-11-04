@@ -18,6 +18,7 @@ func TestCompile(t *testing.T) {
 		setRegisterCompilation(),
 		loopCompilation(),
 		severalStatementsCompilation(),
+		callVmFuncCompilation(),
 	}
 
 	for i, test := range successCases {
@@ -29,7 +30,7 @@ func TestCompile(t *testing.T) {
 	}
 
 	failureCases := []*asm.AST{
-	// programTooBigFailure(),
+		unknownFunctionFailure(),
 	}
 
 	for i, test := range failureCases {
@@ -158,6 +159,33 @@ func setRegisterCompilation() compilation {
 	return makeCompilation(statements, expected)
 }
 
+func callVmFuncCompilation() compilation {
+	callStmtA := &asm.CallStmt{}
+	callStmtA.VmFunc = VM_FUNC_A
+	callStmtA.Operand = 42
+
+	callStmtB := &asm.CallStmt{}
+	callStmtB.VmFunc = VM_FUNC_B
+	callStmtB.Operand = 65
+
+	statements := []asm.Statement{
+		callStmtA,
+		callStmtB,
+	}
+
+	expected := []Operation{
+		Operation{
+			OpCode:  OP_CALL,
+			Operand: [2]Operand{0, 42},
+		},
+		Operation{
+			OpCode:  OP_CALL,
+			Operand: [2]Operand{1, 65},
+		},
+	}
+	return makeCompilation(statements, expected)
+}
+
 func copyRegisterCompilation() compilation {
 	copyStmt := &asm.CopyStmt{}
 	copyStmt.Operand[0] = 255
@@ -256,18 +284,13 @@ func severalStatementsCompilation() compilation {
 	return makeCompilation(statements, expected)
 }
 
-func programTooBigFailure() *asm.AST {
-	setStmt := &asm.SetStmt{}
-
-	const count = 65536
-	ast := &asm.AST{
-		Statements: make([]asm.Statement, count),
+func unknownFunctionFailure() *asm.AST {
+	ast := &asm.AST{}
+	ast.Statements = []asm.Statement{
+		&asm.CallStmt{
+			VmFunc: VM_FUNC_NO_EXIST,
+		},
 	}
-
-	for i := 0; i < count; i++ {
-		ast.Statements[i] = setStmt
-	}
-
 	return ast
 }
 
@@ -316,8 +339,22 @@ func compileFailureHelper(t *testing.T, ast *asm.AST) bool {
 }
 
 func LibTest() *Library {
-	// FIXME Function call tests not implemented.
-	return &Library{}
+	lib := &Library{}
+	lib.AddFunction(VM_FUNC_A, vmFuncA)
+	lib.AddFunction(VM_FUNC_B, vmFuncB)
+	return lib
+}
+
+func vmFuncA(runtime *Runtime, stackAddr Address) {
+	runtime.Process.Pop(stackAddr)
+	runtime.Process.Push(stackAddr, VM_FUNC_A_RETURN)
+	runtime.Process.IncrementPC()
+}
+
+func vmFuncB(runtime *Runtime, stackAddr Address) {
+	runtime.Process.Pop(stackAddr)
+	runtime.Process.Push(stackAddr, VM_FUNC_B_RETURN)
+	runtime.Process.IncrementPC()
 }
 
 type compilation struct {
@@ -331,3 +368,9 @@ func makeCompilation(statements []asm.Statement, expected []Operation) compilati
 		expected: expected,
 	}
 }
+
+const VM_FUNC_A = "vm_func_a"
+const VM_FUNC_B = "vm_func_b"
+const VM_FUNC_NO_EXIST = "vm_func_no_exist"
+const VM_FUNC_A_RETURN = 1
+const VM_FUNC_B_RETURN = 2
