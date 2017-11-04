@@ -78,7 +78,7 @@ func (tape *InfiniteTapeVmWrapper) NewTape(runtime *Runtime, stackAddr Address) 
 	runtime.Process.Pop(stackAddr)
 	index := tape.list.NewTape()
 	runtime.Process.Push(stackAddr, uint64(index))
-	runtime.Process.PC++
+	runtime.Process.IncrementPC()
 }
 
 func (tape *InfiniteTapeVmWrapper) MoveHead(runtime *Runtime, stackAddr Address) {
@@ -88,7 +88,7 @@ func (tape *InfiniteTapeVmWrapper) MoveHead(runtime *Runtime, stackAddr Address)
 	// Subtract from offset, allowing unsigned int 0, and 1 to steer left,
 	// and right, respectively.
 	tape.list.MoveHead(int(index), int(offset)-1)
-	runtime.Process.PC++
+	runtime.Process.IncrementPC()
 }
 
 func (tape *InfiniteTapeVmWrapper) ReadHead(runtime *Runtime, stackAddr Address) {
@@ -96,7 +96,7 @@ func (tape *InfiniteTapeVmWrapper) ReadHead(runtime *Runtime, stackAddr Address)
 	index := runtime.Process.Pop(stackAddr)
 	val := tape.list.ReadHead(int(index))
 	runtime.Process.Push(stackAddr, val)
-	runtime.Process.PC++
+	runtime.Process.IncrementPC()
 }
 
 func (tape *InfiniteTapeVmWrapper) WriteHead(runtime *Runtime, stackAddr Address) {
@@ -104,7 +104,7 @@ func (tape *InfiniteTapeVmWrapper) WriteHead(runtime *Runtime, stackAddr Address
 	index := runtime.Process.Pop(stackAddr)
 	val := runtime.Process.Pop(stackAddr)
 	tape.list.WriteHead(int(index), val)
-	runtime.Process.PC++
+	runtime.Process.IncrementPC()
 }
 
 func init() {

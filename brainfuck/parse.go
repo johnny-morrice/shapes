@@ -59,6 +59,14 @@ func Parse(source []byte) (*asm.AST, error) {
 	input := &asm.WriteStmt{}
 	input.Operand = __VALUE_REGISTER
 
+	setTapeRight := &asm.SetStmt{}
+	setTapeRight.Operand[0] = __TAPE_RIGHT_REGISTER
+	setTapeRight.Operand[1] = 1
+	setIncrement := &asm.SetStmt{}
+	setIncrement.Operand[0] = __INCREMENT_REGISTER
+	setIncrement.Operand[1] = 1
+
+	builder.Append(setTapeRight, setIncrement)
 	builder.Append(newTape, popTapeIndex)
 
 	for _, chr := range source {
@@ -98,4 +106,3 @@ const __VALUE_REGISTER = 0
 const __INCREMENT_REGISTER = 2
 const __TAPE_LEFT_REGISTER = 3
 const __TAPE_RIGHT_REGISTER = 4
-const __RETURN_REGISTER = 5

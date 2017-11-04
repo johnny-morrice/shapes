@@ -83,7 +83,7 @@ func Compile(ast *asm.AST, lib *Library) (*Process, error) {
 	return compiler.Process, compiler.Error
 }
 
-func (process *Process) DebugDump(w io.Writer) {
+func (process *Process) DumpBytecode(w io.Writer) {
 	intPC := int(process.PC)
 	for i, op := range process.ByteCode {
 		fmt.Fprint(w, i)
@@ -92,6 +92,25 @@ func (process *Process) DebugDump(w io.Writer) {
 		}
 		fmt.Fprintf(w, " %v", op)
 		fmt.Fprint(w, "\n")
+	}
+}
+
+func (process *Process) DumpRegisters(w io.Writer) {
+	fmt.Println("REGISTER DUMP:\n")
+
+	for i, reg := range process.Register {
+		fmt.Fprintf(w, "%d %d\n", i, reg)
+	}
+
+	fmt.Println("STACK DUMP:\n")
+	for i, stk := range process.Stack {
+		if len(stk) == 0 {
+			fmt.Fprintf(w, "%d EMPTY\n", i)
+		} else {
+			for j, val := range stk {
+				fmt.Fprintf(w, "%d %d %d\n", i, j, val)
+			}
+		}
 	}
 }
 
@@ -304,6 +323,7 @@ func (runtime *Runtime) write(op Operation) {
 		runtime.Process.Error = errors.Wrap(err, errMsg)
 		return
 	}
+
 	runtime.Process.IncrementPC()
 }
 
@@ -359,7 +379,8 @@ func (runtime *Runtime) DebugDump(w io.Writer) {
 	}
 
 	fmt.Fprint(w, "BYTECODE:\n")
-	runtime.Process.DebugDump(buff)
+	runtime.Process.DumpRegisters(buff)
+	runtime.Process.DumpBytecode(buff)
 	buff.Flush()
 }
 
