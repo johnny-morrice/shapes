@@ -68,9 +68,9 @@ func Parse(source []byte) (*asm.AST, error) {
 		case '>':
 			builder.Append(pushTapeRight, pushTapeIndex, moveTape)
 		case '+':
-			builder.Append(readTape, popValue, increment, pushValue, pushTapeIndex, writeTape)
+			builder.Append(pushTapeIndex, readTape, popValue, increment, pushValue, pushTapeIndex, writeTape)
 		case '-':
-			builder.Append(readTape, popValue, decrement, pushValue, pushTapeIndex, writeTape)
+			builder.Append(pushTapeIndex, readTape, popValue, decrement, pushValue, pushTapeIndex, writeTape)
 		case '.':
 			builder.Append(pushTapeIndex, readTape, popValue, output)
 		case ',':
