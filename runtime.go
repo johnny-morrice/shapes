@@ -288,6 +288,7 @@ func (runtime *Runtime) set(op Operation) {
 
 func (runtime *Runtime) call(op Operation) {
 	callee := runtime.Functions[op.Operand[0]]
+	runtime.Process.Push(op.Address(1), uint64(runtime.Process.PC))
 	callee(runtime, op.Address(1))
 	// Callee moves PC.
 }

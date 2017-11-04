@@ -11,6 +11,12 @@ type Library struct {
 	index     map[string]int
 }
 
+func (lib *Library) AddLibrary(other *Library) {
+	for name, index := range other.index {
+		lib.AddFunction(name, other.Functions[index])
+	}
+}
+
 func (lib *Library) AddFunction(name string, vmFunc VmFunction) {
 	index := len(lib.Functions)
 	lib.Functions = append(lib.Functions, vmFunc)
