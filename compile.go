@@ -11,6 +11,7 @@ type loopStack struct {
 type CompileVisitor struct {
 	Process *Process
 	Error   error
+	Library *Library
 
 	loopStack loopStack
 }
@@ -68,6 +69,24 @@ func (c *CompileVisitor) VisitCopy(stmt *asm.CopyStmt) {
 
 func (c *CompileVisitor) VisitSub(stmt *asm.SubStmt) {
 	c.appendByteCode(twoOp(OP_SUB, stmt.TwoOperandStmt))
+}
+
+func (c *CompileVisitor) VisitJump(stmt *asm.JumpStmt) {
+	c.appendByteCode(twoOp(OP_JMPNZ, stmt.TwoOperandStmt))
+}
+
+func (c *CompileVisitor) VisitCall(stmt *asm.CallStmt) {
+	index, err := c.Library.GetFunctionIndex(stmt.VmFunc)
+
+	if err != nil {
+		c.Error = err
+		return
+	}
+
+	twoOpStmt := asm.TwoOperandStmt{}
+	twoOpStmt.Operand[0] = index
+	twoOpStmt.Operand[1] = stmt.Operand
+	c.appendByteCode(twoOp(OP_CALL, twoOpStmt))
 }
 
 func (c *CompileVisitor) appendByteCode(operations ...Operation) {

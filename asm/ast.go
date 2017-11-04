@@ -31,6 +31,8 @@ type ASTVisitor interface {
 	VisitWrite(write *WriteStmt)
 	VisitSet(set *SetStmt)
 	VisitCopy(copy *CopyStmt)
+	VisitJump(jump *JumpStmt)
+	VisitCall(call *CallStmt)
 }
 
 type OneOperandStmt struct {
@@ -78,6 +80,15 @@ type CopyStmt struct {
 	TwoOperandStmt
 }
 
+type JumpStmt struct {
+	TwoOperandStmt
+}
+
+type CallStmt struct {
+	VmFunc string
+	OneOperandStmt
+}
+
 func (stmt *LoopStmt) Visit(visitor ASTVisitor) {
 	visitor.VisitLoop(stmt)
 
@@ -118,4 +129,12 @@ func (stmt *SetStmt) Visit(visitor ASTVisitor) {
 
 func (stmt *CopyStmt) Visit(visitor ASTVisitor) {
 	visitor.VisitCopy(stmt)
+}
+
+func (stmt *JumpStmt) Visit(visitor ASTVisitor) {
+	visitor.VisitJump(stmt)
+}
+
+func (stmt *CallStmt) Visit(visitor ASTVisitor) {
+	visitor.VisitCall(stmt)
 }

@@ -51,8 +51,10 @@ func MakeProcess(byteCode []Operation) *Process {
 	}
 }
 
-func Compile(ast *asm.AST) (*Process, error) {
-	compiler := &CompileVisitor{}
+func Compile(ast *asm.AST, lib *Library) (*Process, error) {
+	compiler := &CompileVisitor{
+		Library: lib,
+	}
 	ast.Visit(compiler)
 
 	return compiler.Process, compiler.Error

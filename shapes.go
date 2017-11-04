@@ -11,7 +11,7 @@ import (
 func InterpretProgramAST(ast *asm.AST, input io.Reader, output io.Writer) error {
 	const errMsg = "ExecuteProgramCode failed"
 
-	process, err := Compile(ast)
+	process, err := Compile(ast, StdLib())
 
 	if err != nil {
 		return errors.Wrap(err, errMsg)

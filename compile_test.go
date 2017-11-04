@@ -274,7 +274,7 @@ func programTooBigFailure() *asm.AST {
 func compileHelper(t *testing.T, ast *asm.AST, expected *Process) bool {
 	t.Helper()
 
-	actual, err := Compile(ast)
+	actual, err := Compile(ast, LibTest())
 
 	if err != nil {
 		t.Errorf("Expected compile success but got error: %s", err.Error())
@@ -305,7 +305,7 @@ func logByteCode(process *Process) {
 func compileFailureHelper(t *testing.T, ast *asm.AST) bool {
 	t.Helper()
 
-	_, err := Compile(ast)
+	_, err := Compile(ast, LibTest())
 
 	if err == nil {
 		t.Error("Expected compile failure")
@@ -313,6 +313,11 @@ func compileFailureHelper(t *testing.T, ast *asm.AST) bool {
 	}
 
 	return true
+}
+
+func LibTest() *Library {
+	// FIXME Function call tests not implemented.
+	return &Library{}
 }
 
 type compilation struct {
