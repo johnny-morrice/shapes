@@ -1,5 +1,9 @@
 package shapes
 
+import (
+	"github.com/johnny-morrice/shapes/asm"
+)
+
 type InfiniteTape struct {
 	left  []uint64
 	right []uint64
@@ -101,18 +105,13 @@ func (tape *InfiniteTapeVmWrapper) WriteHead(runtime *Runtime, stackAddr Address
 	runtime.Process.PC++
 }
 
-const TAPE_NEW = "tape_new"
-const TAPE_MOVE_HEAD = "tape_move_head"
-const TAPE_READ_HEAD = "tape_read_head"
-const TAPE_WRITE_HEAD = "tape_write_head"
-
 func init() {
 	lib := &Library{}
 	tape := &InfiniteTapeVmWrapper{}
-	lib.AddFunction(TAPE_NEW, tape.NewTape)
-	lib.AddFunction(TAPE_MOVE_HEAD, tape.MoveHead)
-	lib.AddFunction(TAPE_READ_HEAD, tape.ReadHead)
-	lib.AddFunction(TAPE_WRITE_HEAD, tape.WriteHead)
+	lib.AddFunction(asm.TAPE_NEW, tape.NewTape)
+	lib.AddFunction(asm.TAPE_MOVE_HEAD, tape.MoveHead)
+	lib.AddFunction(asm.TAPE_READ_HEAD, tape.ReadHead)
+	lib.AddFunction(asm.TAPE_WRITE_HEAD, tape.WriteHead)
 
 	StdLib().AddLibrary(lib)
 }
