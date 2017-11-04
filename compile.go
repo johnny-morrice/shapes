@@ -83,10 +83,9 @@ func (c *CompileVisitor) VisitCall(stmt *asm.CallStmt) {
 		return
 	}
 
-	twoOpStmt := asm.TwoOperandStmt{}
-	twoOpStmt.Operand[0] = index
-	twoOpStmt.Operand[1] = stmt.Operand
-	c.appendByteCode(twoOp(OP_CALL, twoOpStmt))
+	oneOpStmt := asm.OneOperandStmt{}
+	oneOpStmt.Operand = index
+	c.appendByteCode(oneOp(OP_CALL, oneOpStmt))
 }
 
 func (c *CompileVisitor) appendByteCode(operations ...Operation) {

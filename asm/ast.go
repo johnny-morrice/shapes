@@ -13,6 +13,28 @@ type ASTBuilder struct {
 	stack []block
 }
 
+func (builder *ASTBuilder) Append(statements ...Statement) {
+	builder.prepare()
+
+	for _, stmt := range statements {
+		builder.appendToBlock(stmt)
+	}
+}
+
+func (builder *ASTBuilder) OpenLoop(operand int) {
+	builder.prepare()
+
+	loop := &LoopStmt{}
+	loop.Operand = operand
+	blk := block{statements: &loop.Nest}
+	builder.stack = append(builder.stack, blk)
+}
+
+func (builder *ASTBuilder) appendToBlock(stmt Statement) {
+	tip := builder.stack[len(builder.stack)-1]
+	*tip.statements = append(*tip.statements, stmt)
+}
+
 func (builder *ASTBuilder) LeaveBlock() error {
 	if len(builder.stack) == 0 {
 		return errors.New("Tried to pop stack of length 0")
@@ -22,7 +44,7 @@ func (builder *ASTBuilder) LeaveBlock() error {
 	return nil
 }
 
-func (builder *ASTBuilder) AppendStmt(stmt Statement) {
+func (builder *ASTBuilder) prepare() {
 	if builder.AST == nil {
 		builder.AST = &AST{}
 	}
@@ -31,18 +53,6 @@ func (builder *ASTBuilder) AppendStmt(stmt Statement) {
 		builder.stack = []block{
 			block{statements: &builder.AST.Statements},
 		}
-	}
-
-	tip := builder.stack[len(builder.stack)-1]
-	*tip.statements = append(*tip.statements, stmt)
-
-	// Should use polymorphism to find nested statments when we come to
-	// support more syntactic structures.
-	loop, isLoop := stmt.(*LoopStmt)
-
-	if isLoop {
-		blk := block{statements: &loop.Nest}
-		builder.stack = append(builder.stack, blk)
 	}
 }
 
@@ -132,7 +142,6 @@ type JumpStmt struct {
 
 type CallStmt struct {
 	VmFunc string
-	OneOperandStmt
 }
 
 func (stmt *LoopStmt) Visit(visitor ASTVisitor) {
