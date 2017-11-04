@@ -1,5 +1,51 @@
 package asm
 
+import (
+	"errors"
+)
+
+type block struct {
+	statements *[]Statement
+}
+
+type ASTBuilder struct {
+	AST   *AST
+	stack []block
+}
+
+func (builder *ASTBuilder) LeaveBlock() error {
+	if len(builder.stack) == 0 {
+		return errors.New("Tried to pop stack of length 0")
+	}
+
+	builder.stack = builder.stack[:len(builder.stack)-1]
+	return nil
+}
+
+func (builder *ASTBuilder) AppendStmt(stmt Statement) {
+	if builder.AST == nil {
+		builder.AST = &AST{}
+	}
+
+	if len(builder.stack) == 0 {
+		builder.stack = []block{
+			block{statements: &builder.AST.Statements},
+		}
+	}
+
+	tip := builder.stack[len(builder.stack)-1]
+	*tip.statements = append(*tip.statements, stmt)
+
+	// Should use polymorphism to find nested statments when we come to
+	// support more syntactic structures.
+	loop, isLoop := stmt.(*LoopStmt)
+
+	if isLoop {
+		blk := block{statements: &loop.Nest}
+		builder.stack = append(builder.stack, blk)
+	}
+}
+
 type AST struct {
 	Statements []Statement
 }
