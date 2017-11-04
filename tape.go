@@ -44,35 +44,35 @@ func extendTape(tape *[]uint64, index int) {
 	}
 }
 
-type InfiniteTapeList struct {
+type infiniteTapeList struct {
 	list []*InfiniteTape
 }
 
-func (tape *InfiniteTapeList) NewTape() int {
+func (tape *infiniteTapeList) NewTape() int {
 	index := len(tape.list)
 	tape.list = append(tape.list, &InfiniteTape{})
 	return index
 }
 
-func (tape *InfiniteTapeList) MoveHead(index int, offset int) {
+func (tape *infiniteTapeList) MoveHead(index int, offset int) {
 	tape.list[index].MoveHead(offset)
 }
 
-func (tape *InfiniteTapeList) ReadHead(index int) uint64 {
+func (tape *infiniteTapeList) ReadHead(index int) uint64 {
 	return tape.list[index].ReadHead()
 }
 
-func (tape *InfiniteTapeList) WriteHead(index int, val uint64) {
+func (tape *infiniteTapeList) WriteHead(index int, val uint64) {
 	tape.list[index].WriteHead(val)
 }
 
 type InfiniteTapeVmWrapper struct {
-	list *InfiniteTapeList
+	list *infiniteTapeList
 }
 
 func (tape *InfiniteTapeVmWrapper) NewTape(runtime *Runtime, stackAddr Address) {
 	if tape.list == nil {
-		tape.list = &InfiniteTapeList{}
+		tape.list = &infiniteTapeList{}
 	}
 
 	runtime.Process.Pop(stackAddr)
