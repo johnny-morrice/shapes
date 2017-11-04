@@ -34,6 +34,7 @@ const (
 	OP_WRITE
 	OP_COPY
 	OP_SET
+	OP_CALL
 )
 
 type Process struct {
@@ -132,25 +133,28 @@ func (process *Process) IncrementPC() {
 type RuntimeCall func(op Operation)
 
 type Runtime struct {
-	Process     *Process
+	RuntimeBuilder
 	Error       error
-	CallTable   []RuntimeCall
-	Input       io.Reader
-	Output      io.Writer
+	callTable   []RuntimeCall
 	readBuffer  []byte
 	writeBuffer []byte
 }
 
-func MakeRuntime(process *Process, input io.Reader, output io.Writer) *Runtime {
+type RuntimeBuilder struct {
+	Process   *Process
+	Functions []VmFunction
+	Input     io.Reader
+	Output    io.Writer
+}
+
+func (builder *RuntimeBuilder) Build() *Runtime {
 	runtime := &Runtime{
-		Process:     process,
-		Input:       input,
-		Output:      output,
-		readBuffer:  []byte{0},
-		writeBuffer: []byte{0},
+		RuntimeBuilder: *builder,
+		readBuffer:     []byte{0},
+		writeBuffer:    []byte{0},
 	}
 
-	runtime.CallTable = []RuntimeCall{
+	runtime.callTable = []RuntimeCall{
 		runtime.jmpnz,
 		runtime.add,
 		runtime.sub,
@@ -160,6 +164,7 @@ func MakeRuntime(process *Process, input io.Reader, output io.Writer) *Runtime {
 		runtime.write,
 		runtime.copy,
 		runtime.set,
+		runtime.call,
 	}
 
 	return runtime
@@ -277,13 +282,19 @@ func (runtime *Runtime) copy(op Operation) {
 }
 
 func (runtime *Runtime) set(op Operation) {
-	runtime.Process.SetRegister(op.Address(0), byte(op.Address(1)))
+	runtime.Process.SetRegister(op.Address(0), byte(op.Operand[1]))
 	runtime.Process.IncrementPC()
+}
+
+func (runtime *Runtime) call(op Operation) {
+	callee := runtime.Functions[op.Operand[0]]
+	callee(runtime, op.Address(1))
+	// Callee moves PC.
 }
 
 func (runtime *Runtime) Execute() error {
 	for !runtime.Process.IsTerminated() {
-		runtime.Process.ExecuteStep(runtime.CallTable)
+		runtime.Process.ExecuteStep(runtime.callTable)
 	}
 
 	if runtime.Process.Error != nil {

@@ -17,7 +17,14 @@ func InterpretProgramAST(ast *asm.AST, input io.Reader, output io.Writer) error 
 		return errors.Wrap(err, errMsg)
 	}
 
-	runtime := MakeRuntime(process, input, output)
+	builder := &RuntimeBuilder{
+		Process:   process,
+		Input:     input,
+		Output:    output,
+		Functions: StdLib().Functions,
+	}
+
+	runtime := builder.Build()
 
 	err = runtime.Execute()
 

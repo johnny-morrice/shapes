@@ -228,7 +228,13 @@ func makeExpectProcess(byteCode []Operation, register [REGISTER_COUNT]byte, stac
 }
 
 func (canned cannedProcess) makeRuntime() *Runtime {
-	return MakeRuntime(canned.process, canned.input, canned.output)
+	builder := &RuntimeBuilder{
+		Process: canned.process,
+		Input:   canned.input,
+		Output:  canned.output,
+		// Functions: getTestLib().functions(),
+	}
+	return builder.Build()
 }
 
 func (canned cannedProcess) sameRegisters(t *testing.T, other cannedProcess) bool {
