@@ -85,9 +85,7 @@ func (tape *InfiniteTapeVmWrapper) MoveHead(runtime *Runtime, stackAddr Address)
 	runtime.Process.Pop(stackAddr)
 	index := runtime.Process.Pop(stackAddr)
 	offset := runtime.Process.Pop(stackAddr)
-	// Subtract from offset, allowing unsigned int 0, and 1 to steer left,
-	// and right, respectively.
-	tape.list.MoveHead(int(index), int(offset)-1)
+	tape.list.MoveHead(int(index), int(offset))
 	runtime.Process.IncrementPC()
 }
 

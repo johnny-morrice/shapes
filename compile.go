@@ -96,15 +96,19 @@ func (c *CompileVisitor) appendByteCode(operations ...Operation) {
 func twoOp(opCode OpCode, stmt asm.TwoOperandStmt) Operation {
 	return Operation{
 		OpCode:  opCode,
-		Operand: [2]Operand{Operand(stmt.Operand[0]), Operand(stmt.Operand[1])},
+		Operand: [2]Operand{makeOperand(stmt.Operand[0]), makeOperand(stmt.Operand[1])},
 	}
 }
 
 func oneOp(opCode OpCode, stmt asm.OneOperandStmt) Operation {
 	return Operation{
 		OpCode:  opCode,
-		Operand: [2]Operand{Operand(stmt.Operand), 0},
+		Operand: [2]Operand{makeOperand(stmt.Operand), 0},
 	}
+}
+
+func makeOperand(op int) Operand {
+	return Operand(uint64(op))
 }
 
 const MAX_BYTECODE = 65535

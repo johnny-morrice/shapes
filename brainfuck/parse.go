@@ -14,7 +14,7 @@ func Parse(source []byte) (*asm.AST, error) {
 	pushValue := &asm.PushStmt{}
 	pushValue.Operand[0] = __STACK_INDEX
 	pushValue.Operand[1] = __VALUE_REGISTER
-	popValue := &asm.PushStmt{}
+	popValue := &asm.PopStmt{}
 	popValue.Operand[0] = __STACK_INDEX
 	popValue.Operand[1] = __VALUE_REGISTER
 	increment := &asm.AddStmt{}
@@ -59,50 +59,61 @@ func Parse(source []byte) (*asm.AST, error) {
 	input := &asm.WriteStmt{}
 	input.Operand = __VALUE_REGISTER
 
+	setTapeLeft := &asm.SetStmt{}
+	setTapeLeft.Operand[0] = __TAPE_LEFT_REGISTER
+	setTapeLeft.Operand[1] = -1
 	setTapeRight := &asm.SetStmt{}
 	setTapeRight.Operand[0] = __TAPE_RIGHT_REGISTER
 	setTapeRight.Operand[1] = 1
 	setIncrement := &asm.SetStmt{}
 	setIncrement.Operand[0] = __INCREMENT_REGISTER
 	setIncrement.Operand[1] = 1
+	resetValue := &asm.SetStmt{}
+	resetValue.Operand[0] = __VALUE_REGISTER
+	resetValue.Operand[1] = 0
 
-	builder.Append(setTapeRight, setIncrement)
+	builder.Append(setTapeLeft, setTapeRight, setIncrement)
 	builder.Append(newTape, popTapeIndex)
 
 	for _, chr := range source {
 		switch chr {
 		case '<':
-			builder.Append(pushTapeLeft, pushTapeIndex, moveTape)
+			builder.Append(pushTapeLeft, pushTapeIndex, moveTape, pushTapeIndex, readTape, popValue)
 		case '>':
-			builder.Append(pushTapeRight, pushTapeIndex, moveTape)
+			builder.Append(pushTapeRight, pushTapeIndex, moveTape, pushTapeIndex, readTape, popValue)
 		case '+':
-			builder.Append(pushTapeIndex, readTape, popValue, increment, pushValue, pushTapeIndex, writeTape)
+			builder.Append(increment, pushValue, pushTapeIndex, writeTape)
 		case '-':
-			builder.Append(pushTapeIndex, readTape, popValue, decrement, pushValue, pushTapeIndex, writeTape)
+			builder.Append(decrement, pushValue, pushTapeIndex, writeTape)
 		case '.':
-			builder.Append(pushTapeIndex, readTape, popValue, output)
+			builder.Append(output)
 		case ',':
 			builder.Append(input, pushValue, pushTapeIndex, writeTape)
 		case '[':
 			builder.OpenLoop(__VALUE_REGISTER)
+			loopDepth++
 		case ']':
 			err := builder.LeaveBlock()
 			if err != nil {
 				return nil, errors.New("Closed non-existent loop")
 			}
+			loopDepth--
 		}
 	}
 
-	if loopDepth > 0 {
-		return nil, fmt.Errorf("Parse failed with %d unclosed loops", loopDepth)
+	if loopDepth != 0 {
+		return nil, fmt.Errorf("Unexpected loop nesting depth %d", loopDepth)
 	}
 
 	return builder.AST, nil
 }
 
 const __STACK_INDEX = 0
-const __TAPE_INDEX_REGISTER = 1
-const __VALUE_REGISTER = 0
-const __INCREMENT_REGISTER = 2
-const __TAPE_LEFT_REGISTER = 3
-const __TAPE_RIGHT_REGISTER = 4
+
+const (
+	__VALUE_REGISTER = iota
+	__TAPE_INDEX_REGISTER
+	__INCREMENT_REGISTER
+	__TAPE_LEFT_REGISTER
+	__TAPE_RIGHT_REGISTER
+)
