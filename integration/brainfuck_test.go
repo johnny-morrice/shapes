@@ -33,6 +33,13 @@ func TestBrainfuck(t *testing.T) {
 			expectedOutput: []byte{10, 8, 6, 4, 2, 0},
 		},
 		integrationTest{
+			parseFunc:      brainfuck.Parse,
+			source:         []byte("+++++[>,.<-]"),
+			parseOk:        true,
+			input:          []byte("hello"),
+			expectedOutput: []byte("hello"),
+		},
+		integrationTest{
 			parseFunc: brainfuck.Parse,
 			source:    []byte("[[[]]"),
 			parseOk:   false,

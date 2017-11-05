@@ -56,7 +56,7 @@ func Parse(source []byte) (*asm.AST, error) {
 
 	output := &asm.WriteStmt{}
 	output.Operand = __VALUE_REGISTER
-	input := &asm.WriteStmt{}
+	input := &asm.ReadStmt{}
 	input.Operand = __VALUE_REGISTER
 
 	setTapeLeft := &asm.SetStmt{}
